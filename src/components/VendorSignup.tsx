@@ -104,7 +104,7 @@ const VendorSignup = () => {
                 </ul>
                 
                 <div className="space-y-3">
-                  <Button variant="hero" size="lg" className="w-full">
+                  <Button variant="hero" size="lg" className="w-full" onClick={() => navigate('/vendor/register')}>
                     Start Free Trial
                   </Button>
                   <Button variant="outline" size="lg" className="w-full">
