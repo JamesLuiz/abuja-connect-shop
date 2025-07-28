@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Search, ShoppingCart, User, Store } from 'lucide-react';
+import { Menu, X, Search, ShoppingCart, Store, User } from 'lucide-react';
+import ProfileDropdown from '@/components/ui/ProfileDropdown';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,6 +13,20 @@ const Navigation = () => {
     { name: 'About', href: '#about' },
     { name: 'Contact', href: '#contact' }
   ];
+
+  // Mock user data - in real app this would come from auth context
+  const mockUser = {
+    name: 'Adebayo Johnson',
+    email: 'adebayo.johnson@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=100&h=100&fit=crop&crop=face',
+    role: 'vendor' as const,
+    isVerified: true
+  };
+
+  const handleSignOut = () => {
+    console.log('User signed out');
+    // Handle sign out logic
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -58,9 +73,7 @@ const Navigation = () => {
             <Button variant="ghost" size="icon">
               <ShoppingCart className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-            </Button>
+            <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
             <Button variant="accent" size="sm">
               <Store className="h-4 w-4 mr-2" />
               Sell Now
@@ -95,10 +108,11 @@ const Navigation = () => {
               </a>
             ))}
             <div className="pt-4 pb-3 border-t border-border">
-              <div className="flex items-center px-3 space-x-3">
-                <Button variant="outline" size="sm" className="flex-1">
-                  <User className="h-4 w-4 mr-2" />
-                  Login
+              <div className="flex items-center px-3 space-x-3 mb-3">
+                <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
+                <Button variant="ghost" size="sm" className="flex-1">
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Cart
                 </Button>
                 <Button variant="accent" size="sm" className="flex-1">
                   <Store className="h-4 w-4 mr-2" />
