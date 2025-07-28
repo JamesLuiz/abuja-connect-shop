@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Store, ShoppingBag, Users, TrendingUp } from 'lucide-react';
 import heroImage from '@/assets/hero-shopping.jpg';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
   const stats = [
@@ -10,6 +11,7 @@ const Hero = () => {
     { icon: TrendingUp, value: '₦2M+', label: 'Sales Monthly' }
   ];
 
+  const navigate = useNavigate();
   return (
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background with gradient overlay */}
@@ -42,7 +44,7 @@ const Hero = () => {
             </div>
 
             <div className="animate-slide-up flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
-              <Button variant="hero" size="lg" className="text-lg px-8 py-4">
+              <Button variant="hero" size="lg" className="text-lg px-8 py-4" onClick={() => navigate('/vendor/register')}>
                 Start Selling Today
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

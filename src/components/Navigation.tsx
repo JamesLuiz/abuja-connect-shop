@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Search, ShoppingCart, Store, User } from 'lucide-react';
 import ProfileDropdown from '@/components/ui/ProfileDropdown';
+import { useNavigate } from 'react-router-dom';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const navItems = [
     { name: 'Home', href: '#home' },
@@ -77,7 +79,8 @@ const Navigation = () => {
             <Button 
               variant="accent" 
               size="sm"
-              onClick={() => window.location.href = '/vendor/register'}
+              onClick={() => navigate('/vendor/register')}
+
             >
               <Store className="h-4 w-4 mr-2" />
               Sell Now
@@ -122,7 +125,8 @@ const Navigation = () => {
                   variant="accent" 
                   size="sm" 
                   className="flex-1"
-                  onClick={() => window.location.href = '/vendor/register'}
+                  onClick={() => navigate('/vendor/register')}
+
                 >
                   <Store className="h-4 w-4 mr-2" />
                   Sell Now

@@ -2,8 +2,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, Store, CreditCard, Truck, BarChart, Shield, Headphones } from 'lucide-react';
 import vendorImage from '@/assets/vendor-showcase.jpg';
+import { useNavigate } from 'react-router-dom';
 
 const VendorSignup = () => {
+  const navigate = useNavigate();
   const features = [
     {
       icon: Store,
@@ -149,7 +151,7 @@ const VendorSignup = () => {
               reach customers you never thought possible.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="lg" className="px-8">
+              <Button variant="hero" size="lg" className="px-8" onClick={() => navigate('/vendor/register')}>
                 Get Started Now
               </Button>
               <Button variant="outline" size="lg" className="px-8">
