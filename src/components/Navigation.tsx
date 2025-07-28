@@ -74,7 +74,11 @@ const Navigation = () => {
               <ShoppingCart className="h-5 w-5" />
             </Button>
             <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
-            <Button variant="accent" size="sm">
+            <Button 
+              variant="accent" 
+              size="sm"
+              onClick={() => window.location.href = '/vendor/register'}
+            >
               <Store className="h-4 w-4 mr-2" />
               Sell Now
             </Button>
@@ -114,7 +118,12 @@ const Navigation = () => {
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Cart
                 </Button>
-                <Button variant="accent" size="sm" className="flex-1">
+                <Button 
+                  variant="accent" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => window.location.href = '/vendor/register'}
+                >
                   <Store className="h-4 w-4 mr-2" />
                   Sell Now
                 </Button>
