@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Search, ShoppingCart, Store, User } from 'lucide-react';
 import ProfileDropdown from '@/components/ui/ProfileDropdown';
+import CartSidebar from '@/components/cart/CartSidebar';
 import { useNavigate } from 'react-router-dom';
 
 const Navigation = () => {
@@ -72,9 +73,7 @@ const Navigation = () => {
 
           {/* Right side buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
+            <CartSidebar />
             <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
             <Button 
               variant="accent" 
@@ -117,10 +116,7 @@ const Navigation = () => {
             <div className="pt-4 pb-3 border-t border-border">
               <div className="flex items-center px-3 space-x-3 mb-3">
                 <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
-                <Button variant="ghost" size="sm" className="flex-1">
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Cart
-                </Button>
+                <CartSidebar />
                 <Button 
                   variant="accent" 
                   size="sm" 

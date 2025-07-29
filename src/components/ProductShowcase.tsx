@@ -3,9 +3,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Star, ShoppingCart, Heart, Eye } from 'lucide-react';
 import { useState } from 'react';
+import { useCart } from '@/contexts/CartContext';
 
 const ProductShowcase = () => {
   const [activeCategory, setActiveCategory] = useState('all');
+  const { addToCart } = useCart();
 
   const categories = [
     { id: 'all', name: 'All Products' },
@@ -217,6 +219,17 @@ const ProductShowcase = () => {
                   className="w-full" 
                   disabled={!product.inStock}
                   variant={product.inStock ? "default" : "secondary"}
+                  onClick={() => product.inStock && addToCart({
+                    productId: product.id.toString(),
+                    vendorId: `vendor-${product.id}`,
+                    name: product.name,
+                    price: product.originalPrice,
+                    discountPrice: product.price !== product.originalPrice ? product.price : undefined,
+                    quantity: 1,
+                    image: product.image,
+                    vendor: { name: product.vendor, location: 'Abuja, FCT' },
+                    shipping: { cost: 1500, estimatedDays: 3 }
+                  })}
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   {product.inStock ? 'Add to Cart' : 'Out of Stock'}
