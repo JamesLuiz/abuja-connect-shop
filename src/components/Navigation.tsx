@@ -10,12 +10,12 @@ const Navigation = () => {
   const navigate = useNavigate();
 
   const navItems = [
-    { name: 'Home', href: '#home' },
-    { name: 'Products', href: '#products' },
-    { name: 'Vendors', href: '#vendors' },
-    { name: 'Orders', href: '/orders' },
-    { name: 'About', href: '#about' },
-    { name: 'Contact', href: '#contact' }
+    { name: 'Home', href: '#home', type: 'scroll' },
+    { name: 'Products', href: '#products', type: 'scroll' },
+    { name: 'Vendors', href: '#vendors', type: 'scroll' },
+    { name: 'Orders', href: '/orders', type: 'route' },
+    { name: 'About', href: '#about', type: 'scroll' },
+    { name: 'Contact', href: '#contact', type: 'scroll' }
   ];
 
   // Mock user data - in real app this would come from auth context
@@ -55,13 +55,23 @@ const Navigation = () => {
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300"
-                >
-                  {item.name}
-                </a>
+                item.type === 'route' ? (
+                  <button
+                    key={item.name}
+                    onClick={() => navigate(item.href)}
+                    className="text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300"
+                  >
+                    {item.name}
+                  </button>
+                ) : (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className="text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300"
+                  >
+                    {item.name}
+                  </a>
+                )
               ))}
             </div>
           </div>
@@ -111,14 +121,27 @@ const Navigation = () => {
         <div className="md:hidden bg-background border-t border-border">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-foreground hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </a>
+              item.type === 'route' ? (
+                <button
+                  key={item.name}
+                  onClick={() => {
+                    navigate(item.href);
+                    setIsMenuOpen(false);
+                  }}
+                  className="text-foreground hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 text-left w-full"
+                >
+                  {item.name}
+                </button>
+              ) : (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="text-foreground hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.name}
+                </a>
+              )
             ))}
             <div className="pt-4 pb-3 border-t border-border">
               <div className="flex items-center px-3 space-x-3 mb-3">

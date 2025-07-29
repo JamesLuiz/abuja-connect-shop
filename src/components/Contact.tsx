@@ -2,6 +2,7 @@ import { MapPin, Phone, Mail, Clock, Send, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import QuickActions from '@/components/ui/QuickActions';
 import { useState } from 'react';
 
 const Contact = () => {
@@ -90,20 +91,7 @@ const Contact = () => {
             {/* Quick Actions */}
             <div className="bg-muted/30 border border-border rounded-lg p-6">
               <h4 className="font-semibold text-foreground mb-4">Quick Actions</h4>
-              <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Start Live Chat
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Phone className="h-4 w-4 mr-2" />
-                  Schedule a Call
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Mail className="h-4 w-4 mr-2" />
-                  Email Support
-                </Button>
-              </div>
+              <QuickActions />
             </div>
           </div>
 

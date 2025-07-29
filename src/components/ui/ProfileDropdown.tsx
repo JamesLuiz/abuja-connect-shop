@@ -227,8 +227,7 @@ const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
                 key={index} 
                 className="px-4 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50"
                 onClick={() => {
-                  // Handle navigation here
-                  console.log(`Navigate to ${item.href}`);
+                  window.location.href = item.href;
                   setIsOpen(false);
                 }}
               >

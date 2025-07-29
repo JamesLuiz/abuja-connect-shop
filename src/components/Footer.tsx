@@ -27,12 +27,12 @@ const Footer = () => {
   ];
 
   const categories = [
-    { name: 'Electronics', href: '#electronics' },
-    { name: 'Fashion & Style', href: '#fashion' },
-    { name: 'Home & Garden', href: '#home' },
-    { name: 'Beauty & Health', href: '#beauty' },
-    { name: 'Sports & Fitness', href: '#sports' },
-    { name: 'Books & Media', href: '#books' }
+    { name: 'Electronics', href: '/vendor/electronics' },
+    { name: 'Fashion & Style', href: '/vendor/fashion' },
+    { name: 'Home & Garden', href: '/vendor/home-garden' },
+    { name: 'Beauty & Health', href: '/vendor/beauty' },
+    { name: 'Sports & Fitness', href: '/vendor/sports' },
+    { name: 'Books & Media', href: '/vendor/books' }
   ];
 
   const services = [
