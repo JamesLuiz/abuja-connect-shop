@@ -7,10 +7,9 @@ import { useCart } from '@/contexts/CartContext';
 
 const ProductShowcase = () => {
   const [activeCategory, setActiveCategory] = useState('all');
-  const { addToCart } = useCart();
 
   const categories = [
-    { id: 'all', name: 'All Products' },
+    { id: 'all', name: 'All Vendors' },
     { id: 'electronics', name: 'Electronics' },
     { id: 'fashion', name: 'Fashion' },
     { id: 'home', name: 'Home & Garden' },
@@ -18,90 +17,127 @@ const ProductShowcase = () => {
     { id: 'sports', name: 'Sports' }
   ];
 
-  const products = [
+  // Mock vendor catalogues with best-selling products
+  const vendorCatalogues = [
     {
-      id: 1,
-      name: 'Premium Wireless Headphones',
-      price: 45000,
-      originalPrice: 60000,
+      id: 'tech-hub-abuja',
+      name: 'TechHub Abuja',
+      category: 'electronics',
+      location: 'Wuse 2, Abuja FCT',
       rating: 4.8,
-      reviews: 124,
-      category: 'electronics',
-      vendor: 'TechHub Abuja',
-      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
-      discount: 25,
-      inStock: true
+      reviews: 324,
+      totalProducts: 47,
+      verified: true,
+      bestSellingProduct: {
+        id: 1,
+        name: 'Premium Wireless Headphones',
+        price: 45000,
+        originalPrice: 60000,
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
+        discount: 25
+      },
+      description: 'Your premier destination for electronics and gadgets in Abuja'
     },
     {
-      id: 2,
-      name: 'Elegant African Print Dress',
-      price: 15000,
-      originalPrice: 20000,
-      rating: 4.9,
-      reviews: 89,
+      id: 'ankara-styles',
+      name: 'Ankara Styles',
       category: 'fashion',
-      vendor: 'Ankara Styles',
-      image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop',
-      discount: 25,
-      inStock: true
+      location: 'Garki 2, Abuja FCT',
+      rating: 4.9,
+      reviews: 156,
+      totalProducts: 89,
+      verified: true,
+      bestSellingProduct: {
+        id: 2,
+        name: 'Elegant African Print Dress',
+        price: 15000,
+        originalPrice: 20000,
+        image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop',
+        discount: 25
+      },
+      description: 'Authentic African fashion and contemporary designs'
     },
     {
-      id: 3,
-      name: 'Smartphone with 128GB Storage',
-      price: 180000,
-      originalPrice: 220000,
-      rating: 4.7,
-      reviews: 256,
+      id: 'mobile-world',
+      name: 'Mobile World',
       category: 'electronics',
-      vendor: 'Mobile World',
-      image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop',
-      discount: 18,
-      inStock: true
+      location: 'Central Area, Abuja FCT',
+      rating: 4.7,
+      reviews: 289,
+      totalProducts: 156,
+      verified: true,
+      bestSellingProduct: {
+        id: 3,
+        name: 'Smartphone with 128GB Storage',
+        price: 180000,
+        originalPrice: 220000,
+        image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop',
+        discount: 18
+      },
+      description: 'Latest smartphones and mobile accessories'
     },
     {
-      id: 4,
-      name: 'Organic Face Cream Set',
-      price: 8500,
-      originalPrice: 12000,
-      rating: 4.6,
-      reviews: 67,
+      id: 'natural-glow',
+      name: 'Natural Glow',
       category: 'beauty',
-      vendor: 'Natural Glow',
-      image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop',
-      discount: 29,
-      inStock: true
+      location: 'Maitama, Abuja FCT',
+      rating: 4.6,
+      reviews: 198,
+      totalProducts: 67,
+      verified: true,
+      bestSellingProduct: {
+        id: 4,
+        name: 'Organic Face Cream Set',
+        price: 8500,
+        originalPrice: 12000,
+        image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop',
+        discount: 29
+      },
+      description: 'Natural and organic beauty products for healthy skin'
     },
     {
-      id: 5,
-      name: 'Modern Table Lamp',
-      price: 25000,
-      originalPrice: 35000,
-      rating: 4.5,
-      reviews: 43,
+      id: 'home-decor-plus',
+      name: 'Home Decor Plus',
       category: 'home',
-      vendor: 'Home Decor Plus',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
-      discount: 29,
-      inStock: false
+      location: 'Asokoro, Abuja FCT',
+      rating: 4.5,
+      reviews: 134,
+      totalProducts: 203,
+      verified: false,
+      bestSellingProduct: {
+        id: 5,
+        name: 'Modern Table Lamp',
+        price: 25000,
+        originalPrice: 35000,
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+        discount: 29
+      },
+      description: 'Transform your space with our curated home decor collection'
     },
     {
-      id: 6,
-      name: 'Fitness Tracker Watch',
-      price: 32000,
-      originalPrice: 40000,
-      rating: 4.4,
-      reviews: 178,
+      id: 'fitlife-store',
+      name: 'FitLife Store',
       category: 'sports',
-      vendor: 'FitLife Store',
-      image: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=400&h=400&fit=crop',
-      discount: 20,
-      inStock: true
+      location: 'Utako, Abuja FCT',
+      rating: 4.4,
+      reviews: 245,
+      totalProducts: 112,
+      verified: true,
+      bestSellingProduct: {
+        id: 6,
+        name: 'Fitness Tracker Watch',
+        price: 32000,
+        originalPrice: 40000,
+        image: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=400&h=400&fit=crop',
+        discount: 20
+      },
+      description: 'Everything you need for your fitness journey'
     }
   ];
 
-  const filteredProducts = activeCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category === activeCategory);
+  const filteredVendors = activeCategory === 'all' 
+    ? vendorCatalogues 
+    : vendorCatalogues.filter(vendor => vendor.category === activeCategory);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-NG', {
@@ -117,14 +153,14 @@ const ProductShowcase = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            <span className="text-foreground">Featured</span>{' '}
+            <span className="text-foreground">Vendor</span>{' '}
             <span className="bg-gradient-primary bg-clip-text text-transparent">
-              Products
+              Catalogues
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Discover amazing products from trusted Abuja vendors. Quality guaranteed, 
-            fast delivery, and secure payments.
+            Explore curated collections from trusted Abuja vendors. Each vendor showcases 
+            their best-selling products and complete catalogue.
           </p>
         </div>
 
@@ -142,98 +178,95 @@ const ProductShowcase = () => {
           ))}
         </div>
 
-        {/* Products Grid */}
+        {/* Vendor Catalogues Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {filteredProducts.map((product) => (
-            <Card key={product.id} className="group border-border hover:shadow-soft transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+          {filteredVendors.map((vendor) => (
+            <Card 
+              key={vendor.id} 
+              className="group border-border hover:shadow-soft transition-all duration-300 hover:-translate-y-1 overflow-hidden cursor-pointer"
+              onClick={() => window.location.href = `/vendor/${vendor.id}`}
+            >
               <div className="relative overflow-hidden">
                 <img
-                  src={product.image}
-                  alt={product.name}
+                  src={vendor.bestSellingProduct.image}
+                  alt={vendor.bestSellingProduct.name}
                   className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 
-                {/* Overlay Actions */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
-                  <Button size="icon" variant="secondary" className="h-10 w-10">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button size="icon" variant="secondary" className="h-10 w-10">
-                    <Heart className="h-4 w-4" />
-                  </Button>
-                  <Button size="icon" variant="default" className="h-10 w-10">
-                    <ShoppingCart className="h-4 w-4" />
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                
+                {/* Overlay Content */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <Button variant="secondary" className="bg-background/90 backdrop-blur-sm">
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Catalogue
                   </Button>
                 </div>
 
                 {/* Badges */}
                 <div className="absolute top-3 left-3 flex gap-2">
-                  {product.discount > 0 && (
+                  {vendor.bestSellingProduct.discount > 0 && (
                     <Badge variant="destructive" className="bg-highlight">
-                      -{product.discount}%
+                      -{vendor.bestSellingProduct.discount}%
                     </Badge>
                   )}
-                  {!product.inStock && (
-                    <Badge variant="secondary">
-                      Out of Stock
+                  {vendor.verified && (
+                    <Badge className="bg-primary text-primary-foreground">
+                      Verified
                     </Badge>
                   )}
+                </div>
+
+                {/* Product Count */}
+                <div className="absolute top-3 right-3">
+                  <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
+                    {vendor.totalProducts} items
+                  </Badge>
                 </div>
               </div>
 
               <CardContent className="p-6">
-                <div className="mb-2">
-                  <Badge variant="outline" className="text-xs">
-                    {product.vendor}
-                  </Badge>
+                <div className="mb-4">
+                  <h3 className="font-bold text-xl text-foreground mb-1">
+                    {vendor.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {vendor.location}
+                  </p>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {vendor.description}
+                  </p>
                 </div>
                 
-                <h3 className="font-semibold text-lg text-foreground mb-2 line-clamp-2">
-                  {product.name}
-                </h3>
-                
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-4">
                   <div className="flex items-center">
                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-medium ml-1">{product.rating}</span>
+                    <span className="text-sm font-medium ml-1">{vendor.rating}</span>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    ({product.reviews} reviews)
+                    ({vendor.reviews} reviews)
                   </span>
                 </div>
                 
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl font-bold text-foreground">
-                      {formatPrice(product.price)}
-                    </span>
-                    {product.originalPrice > product.price && (
-                      <span className="text-sm text-muted-foreground line-through">
-                        {formatPrice(product.originalPrice)}
+                <div className="border-t border-border pt-4">
+                  <p className="text-xs text-muted-foreground mb-2">Best Selling Product:</p>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-sm line-clamp-1">
+                      {vendor.bestSellingProduct.name}
+                    </h4>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-bold text-primary">
+                        {formatPrice(vendor.bestSellingProduct.price)}
                       </span>
-                    )}
+                      {vendor.bestSellingProduct.originalPrice > vendor.bestSellingProduct.price && (
+                        <span className="text-xs text-muted-foreground line-through">
+                          {formatPrice(vendor.bestSellingProduct.originalPrice)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-                
-                <Button 
-                  className="w-full" 
-                  disabled={!product.inStock}
-                  variant={product.inStock ? "default" : "secondary"}
-                  onClick={() => product.inStock && addToCart({
-                    productId: product.id.toString(),
-                    vendorId: `vendor-${product.id}`,
-                    name: product.name,
-                    price: product.originalPrice,
-                    discountPrice: product.price !== product.originalPrice ? product.price : undefined,
-                    quantity: 1,
-                    image: product.image,
-                    vendor: { name: product.vendor, location: 'Abuja, FCT' },
-                    shipping: { cost: 1500, estimatedDays: 3 }
-                  })}
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-                </Button>
               </CardContent>
             </Card>
           ))}
@@ -242,7 +275,7 @@ const ProductShowcase = () => {
         {/* View More */}
         <div className="text-center">
           <Button variant="outline" size="lg" className="px-8">
-            View All Products
+            View All Vendors
           </Button>
         </div>
       </div>
