@@ -21,7 +21,11 @@ import {
   BarChart3,
   Shield,
   Users,
-  CheckCircle
+  CheckCircle,
+  Phone,
+  MapPin,
+  Calendar,
+  Star
 } from 'lucide-react';
 
 interface ProfileDropdownProps {
@@ -31,6 +35,14 @@ interface ProfileDropdownProps {
     avatar?: string;
     role: 'customer' | 'vendor' | 'admin';
     isVerified: boolean;
+    phone?: string;
+    location?: string;
+    joinDate?: string;
+    totalOrders?: number;
+    totalSpent?: number;
+    storeRevenue?: number;
+    storeRating?: number;
+    completedSales?: number;
   };
   onSignOut?: () => void;
 }
@@ -120,7 +132,7 @@ const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
       >
         {/* User Info Header */}
         <div className="p-4 border-b border-border">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 mb-4">
             <Avatar className="h-12 w-12">
               <AvatarImage src={user.avatar} alt={user.name} />
               <AvatarFallback className="bg-primary/10 text-primary text-lg font-medium">
@@ -142,6 +154,68 @@ const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
               {getRoleBadge()}
             </div>
           </div>
+
+          {/* Additional User Info */}
+          <div className="space-y-2 text-xs">
+            {user.phone && (
+              <div className="flex items-center text-muted-foreground">
+                <Phone className="h-3 w-3 mr-2" />
+                <span>{user.phone}</span>
+              </div>
+            )}
+            {user.location && (
+              <div className="flex items-center text-muted-foreground">
+                <MapPin className="h-3 w-3 mr-2" />
+                <span>{user.location}</span>
+              </div>
+            )}
+            {user.joinDate && (
+              <div className="flex items-center text-muted-foreground">
+                <Calendar className="h-3 w-3 mr-2" />
+                <span>Joined {user.joinDate}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Role-specific Stats */}
+          {user.role === 'customer' && (
+            <div className="mt-4 pt-3 border-t border-border">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <div className="text-lg font-bold text-foreground">{user.totalOrders || 0}</div>
+                  <div className="text-xs text-muted-foreground">Orders</div>
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-foreground">₦{user.totalSpent?.toLocaleString() || '0'}</div>
+                  <div className="text-xs text-muted-foreground">Total Spent</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {user.role === 'vendor' && (
+            <div className="mt-4 pt-3 border-t border-border">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <div className="text-lg font-bold text-foreground">₦{user.storeRevenue?.toLocaleString() || '0'}</div>
+                  <div className="text-xs text-muted-foreground">Revenue</div>
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-foreground">{user.completedSales || 0}</div>
+                  <div className="text-xs text-muted-foreground">Sales</div>
+                </div>
+              </div>
+              {user.storeRating && (
+                <div className="mt-2 text-center">
+                  <div className="flex items-center justify-center">
+                    <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                    <span className="text-sm font-medium text-foreground">{user.storeRating}</span>
+                    <span className="text-xs text-muted-foreground ml-1">rating</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Menu Items */}

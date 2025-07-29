@@ -24,7 +24,13 @@ const Navigation = () => {
     email: 'adebayo.johnson@gmail.com',
     avatar: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=100&h=100&fit=crop&crop=face',
     role: 'vendor' as const,
-    isVerified: true
+    isVerified: true,
+    phone: '+234 809 123 4567',
+    location: 'Abuja, FCT',
+    joinDate: 'March 2023',
+    storeRevenue: 2450000,
+    storeRating: 4.8,
+    completedSales: 342
   };
 
   const handleSignOut = () => {
