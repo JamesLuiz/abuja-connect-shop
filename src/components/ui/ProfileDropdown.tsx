@@ -25,7 +25,8 @@ import {
   Phone,
   MapPin,
   Calendar,
-  Star
+  Star,
+  Package
 } from 'lucide-react';
 
 interface ProfileDropdownProps {

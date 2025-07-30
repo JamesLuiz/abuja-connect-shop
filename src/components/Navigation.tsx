@@ -115,12 +115,15 @@ const Navigation = () => {
             </Button>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile right section - Profile and Cart outside hamburger */}
+          <div className="md:hidden flex items-center space-x-2">
+            <CartSidebar />
+            <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="ml-2"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
@@ -142,13 +145,11 @@ const Navigation = () => {
               </button>
             ))}
             <div className="pt-4 pb-3 border-t border-border">
-              <div className="flex items-center px-3 space-x-3 mb-3">
-                <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
-                <CartSidebar />
+              <div className="flex justify-center px-3">
                 <Button 
                   variant="accent" 
                   size="sm" 
-                  className="flex-1"
+                  className="w-full"
                   onClick={() => navigate('/vendor/register')}
                 >
                   <Store className="h-4 w-4 mr-2" />

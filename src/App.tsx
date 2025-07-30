@@ -14,6 +14,9 @@ import VendorStore from "@/pages/VendorStore";
 import VendorOrderManagement from "@/pages/VendorOrderManagement";
 import VendorAnalytics from "@/pages/VendorAnalytics";
 import VendorSettings from "@/pages/VendorSettings";
+import HelpSupport from "@/pages/HelpSupport";
+import EditProfile from "@/pages/EditProfile";
+import AddProduct from "@/pages/AddProduct";
 import { CartProvider } from "@/contexts/CartContext";
 const queryClient = new QueryClient();
 
@@ -35,6 +38,9 @@ const App = () => (
             <Route path="/vendor/orders" element={<VendorOrderManagement />} />
             <Route path="/vendor/analytics" element={<VendorAnalytics />} />
             <Route path="/vendor/settings" element={<VendorSettings />} />
+            <Route path="/help" element={<HelpSupport />} />
+            <Route path="/profile/edit" element={<EditProfile />} />
+            <Route path="/vendor/products/add" element={<AddProduct />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
