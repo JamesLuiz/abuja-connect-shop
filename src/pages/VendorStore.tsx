@@ -113,6 +113,7 @@ const VendorStore = () => {
 
   const handleViewStore = () => {
     // Navigate to public store view
+    navigate('/vendor/:vendorId') 
     toast({
       title: "Opening Store View",
       description: "Opening your public store page...",
