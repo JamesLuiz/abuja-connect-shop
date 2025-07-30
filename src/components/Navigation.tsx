@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Menu, X, Search, ShoppingCart, Store, User } from 'lucide-react';
 import ProfileDropdown from '@/components/ui/ProfileDropdown';
 import CartSidebar from '@/components/cart/CartSidebar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const navItems = [
     { name: 'Home', href: '#home', type: 'scroll' },
@@ -38,6 +39,25 @@ const Navigation = () => {
     // Handle sign out logic
   };
 
+  const handleNavClick = (item) => {
+    if (item.type === 'route') {
+      navigate(item.href);
+    } else {
+      // For scroll navigation, first check if we're on the home page
+      if (location.pathname !== '/') {
+        // If not on home page, navigate to home with the hash
+        navigate('/' + item.href);
+      } else {
+        // If on home page, just scroll to the section
+        const element = document.querySelector(item.href);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -45,9 +65,12 @@ const Navigation = () => {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              <button
+                onClick={() => navigate('/')}
+                className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+              >
                 Abuja E-Mall
-              </h1>
+              </button>
             </div>
           </div>
 
@@ -55,23 +78,13 @@ const Navigation = () => {
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navItems.map((item) => (
-                item.type === 'route' ? (
-                  <button
-                    key={item.name}
-                    onClick={() => navigate(item.href)}
-                    className="text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300"
-                  >
-                    {item.name}
-                  </button>
-                ) : (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    className="text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300"
-                  >
-                    {item.name}
-                  </a>
-                )
+                <button
+                  key={item.name}
+                  onClick={() => handleNavClick(item)}
+                  className="text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300"
+                >
+                  {item.name}
+                </button>
               ))}
             </div>
           </div>
@@ -96,7 +109,6 @@ const Navigation = () => {
               variant="accent" 
               size="sm"
               onClick={() => navigate('/vendor/register')}
-
             >
               <Store className="h-4 w-4 mr-2" />
               Sell Now
@@ -121,27 +133,13 @@ const Navigation = () => {
         <div className="md:hidden bg-background border-t border-border">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navItems.map((item) => (
-              item.type === 'route' ? (
-                <button
-                  key={item.name}
-                  onClick={() => {
-                    navigate(item.href);
-                    setIsMenuOpen(false);
-                  }}
-                  className="text-foreground hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 text-left w-full"
-                >
-                  {item.name}
-                </button>
-              ) : (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="text-foreground hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </a>
-              )
+              <button
+                key={item.name}
+                onClick={() => handleNavClick(item)}
+                className="text-foreground hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 text-left w-full"
+              >
+                {item.name}
+              </button>
             ))}
             <div className="pt-4 pb-3 border-t border-border">
               <div className="flex items-center px-3 space-x-3 mb-3">
@@ -152,7 +150,6 @@ const Navigation = () => {
                   size="sm" 
                   className="flex-1"
                   onClick={() => navigate('/vendor/register')}
-
                 >
                   <Store className="h-4 w-4 mr-2" />
                   Sell Now
