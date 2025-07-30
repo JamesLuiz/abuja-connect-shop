@@ -40,9 +40,9 @@ const App = () => (
             <Route path="/vendor/settings" element={<VendorSettings />} />
             <Route path="/help" element={<HelpSupport />} />
             <Route path="/profile/edit" element={<EditProfile />} />
-            <Route path="/vendor/products/add" element={<AddProduct />} />
+            <Route path="/add-product" element={<AddProduct />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<NotFound />} /> 
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
