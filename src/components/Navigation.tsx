@@ -20,6 +20,7 @@ const Navigation = () => {
   ];
 
   // Mock user data - in real app this would come from auth context
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Change to true to test authenticated state
   const mockUser = {
     name: 'Adebayo Johnson',
     email: 'adebayo.johnson@gmail.com',
@@ -104,21 +105,42 @@ const Navigation = () => {
           {/* Right side buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <CartSidebar />
-            <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
-            <Button 
-              variant="accent" 
-              size="sm"
-              onClick={() => navigate('/vendor/register')}
-            >
-              <Store className="h-4 w-4 mr-2" />
-              Sell Now
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
+                <Button 
+                  variant="accent" 
+                  size="sm"
+                  onClick={() => navigate('/vendor/register')}
+                >
+                  <Store className="h-4 w-4 mr-2" />
+                  Sell Now
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" onClick={() => navigate("/login")}>
+                  Sign In
+                </Button>
+                <Button size="sm" onClick={() => navigate("/login")}>
+                  Sign Up
+                </Button>
+                <Button 
+                  variant="accent" 
+                  size="sm"
+                  onClick={() => navigate('/vendor/register')}
+                >
+                  <Store className="h-4 w-4 mr-2" />
+                  Sell Now
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile right section - Profile and Cart outside hamburger */}
           <div className="md:hidden flex items-center space-x-2">
             <CartSidebar />
-            <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
+            {isAuthenticated && <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />}
             <Button
               variant="ghost"
               size="icon"
@@ -144,7 +166,26 @@ const Navigation = () => {
                 {item.name}
               </button>
             ))}
-            <div className="pt-4 pb-3 border-t border-border">
+            <div className="pt-4 pb-3 border-t border-border space-y-3">
+              {!isAuthenticated && (
+                <div className="flex gap-2 px-3">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => navigate('/login')}
+                  >
+                    Sign In
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => navigate('/login')}
+                  >
+                    Sign Up
+                  </Button>
+                </div>
+              )}
               <div className="flex justify-center px-3">
                 <Button 
                   variant="accent" 

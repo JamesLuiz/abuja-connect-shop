@@ -26,6 +26,7 @@ import PublishArticle from "@/pages/PublishArticle";
 import JobApplication from "@/pages/JobApplication";
 import JobDetails from "@/pages/JobDetails";
 import CategoryVendors from "@/pages/CategoryVendors";
+import Login from "@/pages/Login";
 import { CartProvider } from "@/contexts/CartContext";
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
         <Route path="/careers/apply/:jobId" element={<JobApplication />} />
         <Route path="/careers/job/:jobId" element={<JobDetails />} />
             <Route path="/category/:category" element={<CategoryVendors />} />
+            <Route path="/login" element={<Login />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} /> 
           </Routes>
