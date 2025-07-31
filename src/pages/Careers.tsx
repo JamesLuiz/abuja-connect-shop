@@ -16,8 +16,11 @@ import {
   Building,
   Calendar
 } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Careers = () => {
+  const navigate = useNavigate();
   const openPositions = [
     {
       id: 1,
@@ -176,6 +179,11 @@ const Careers = () => {
   ];
 
   const departments = [...new Set(openPositions.map(pos => pos.department))];
+  const [selectedDepartment, setSelectedDepartment] = useState('All Departments');
+  
+  const filteredPositions = selectedDepartment === 'All Departments' 
+    ? openPositions 
+    : openPositions.filter(pos => pos.department === selectedDepartment);
 
   return (
     <div className="min-h-screen bg-background">
@@ -249,9 +257,20 @@ const Careers = () => {
 
           {/* Department Filter */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
-            <Button variant="default" className="rounded-full">All Departments</Button>
+            <Button 
+              variant={selectedDepartment === 'All Departments' ? "default" : "outline"} 
+              className="rounded-full"
+              onClick={() => setSelectedDepartment('All Departments')}
+            >
+              All Departments
+            </Button>
             {departments.map((dept) => (
-              <Button key={dept} variant="outline" className="rounded-full">
+              <Button 
+                key={dept} 
+                variant={selectedDepartment === dept ? "default" : "outline"} 
+                className="rounded-full"
+                onClick={() => setSelectedDepartment(dept)}
+              >
                 {dept}
               </Button>
             ))}
@@ -259,7 +278,7 @@ const Careers = () => {
 
           {/* Job Listings */}
           <div className="space-y-6">
-            {openPositions.map((job) => (
+            {filteredPositions.map((job) => (
               <Card key={job.id} className="hover:shadow-elegant transition-all duration-300">
                 <CardContent className="p-6">
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -305,11 +324,11 @@ const Careers = () => {
                     </div>
                     
                     <div className="lg:ml-6 flex flex-col sm:flex-row lg:flex-col gap-3">
-                      <Button className="group">
+                      <Button className="group" onClick={() => navigate(`/careers/apply/${job.id}`)}>
                         Apply Now
                         <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                       </Button>
-                      <Button variant="outline">
+                      <Button variant="outline" onClick={() => navigate(`/careers/job/${job.id}`)}>
                         View Details
                       </Button>
                     </div>

@@ -20,6 +20,13 @@ const CategoryVendors = () => {
   const { category } = useParams();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    rating: '',
+    location: '',
+    verified: false,
+    priceRange: ''
+  });
 
   // Mock data for vendors by category
   const vendorsByCategory = {
@@ -193,11 +200,64 @@ const CategoryVendors = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Button variant="outline" className="h-12 px-6">
+              <Button variant="outline" className="h-12 px-6" onClick={() => setShowFilters(!showFilters)}>
                 <Filter className="h-5 w-5 mr-2" />
                 Filters
               </Button>
             </div>
+
+            {/* Filter Panel */}
+            {showFilters && (
+              <div className="bg-secondary/20 p-6 rounded-lg mt-6">
+                <h3 className="font-semibold mb-4">Filter Options</h3>
+                <div className="grid md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Minimum Rating</label>
+                    <select 
+                      className="w-full p-2 border rounded-md bg-background"
+                      value={filters.rating}
+                      onChange={(e) => setFilters({...filters, rating: e.target.value})}
+                    >
+                      <option value="">Any Rating</option>
+                      <option value="4.5">4.5+ Stars</option>
+                      <option value="4.0">4.0+ Stars</option>
+                      <option value="3.5">3.5+ Stars</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Location</label>
+                    <select 
+                      className="w-full p-2 border rounded-md bg-background"
+                      value={filters.location}
+                      onChange={(e) => setFilters({...filters, location: e.target.value})}
+                    >
+                      <option value="">All Locations</option>
+                      <option value="Wuse">Wuse</option>
+                      <option value="Garki">Garki</option>
+                      <option value="Maitama">Maitama</option>
+                      <option value="Utako">Utako</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Verification</label>
+                    <label className="flex items-center space-x-2">
+                      <input 
+                        type="checkbox"
+                        checked={filters.verified}
+                        onChange={(e) => setFilters({...filters, verified: e.target.checked})}
+                        className="rounded"
+                      />
+                      <span>Verified vendors only</span>
+                    </label>
+                  </div>
+                  <div className="flex items-end">
+                    <Button variant="outline" onClick={() => setFilters({rating: '', location: '', verified: false, priceRange: ''})}>
+                      Clear Filters
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Vendor Count */}

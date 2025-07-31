@@ -17,8 +17,10 @@ import {
   Share2
 } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Blog = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -149,6 +151,13 @@ const Blog = () => {
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
               Insights, tips, and stories to help you succeed in the digital marketplace
             </p>
+            
+            <div className="flex justify-center mb-8">
+              <Button size="lg" className="group" onClick={() => navigate('/blog/publish')}>
+                Publish Your Article
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </div>
             
             {/* Search Bar */}
             <div className="relative max-w-xl mx-auto">
