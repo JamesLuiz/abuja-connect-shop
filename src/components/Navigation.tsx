@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Search, ShoppingCart, Store, User } from 'lucide-react';
+import { Menu, X, Search, Store } from 'lucide-react';
 import ProfileDropdown from '@/components/ui/ProfileDropdown';
 import CartSidebar from '@/components/cart/CartSidebar';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -20,7 +20,8 @@ const Navigation = () => {
   ];
 
   // Mock user data - in real app this would come from auth context
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Change to true to test authenticated state
+  // Change isAuthenticated to true to test authenticated state
+  const [isAuthenticated, setIsAuthenticated] = useState(true); 
   const mockUser = {
     name: 'Adebayo Johnson',
     email: 'adebayo.johnson@gmail.com',
@@ -38,6 +39,7 @@ const Navigation = () => {
   const handleSignOut = () => {
     console.log('User signed out');
     // Handle sign out logic
+    setIsAuthenticated(false);
   };
 
   const handleNavClick = (item) => {
@@ -105,9 +107,9 @@ const Navigation = () => {
           {/* Right side buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <CartSidebar />
+            {/* Conditional rendering for authenticated state */}
             {isAuthenticated ? (
               <>
-                <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
                 <Button 
                   variant="accent" 
                   size="sm"
@@ -116,6 +118,7 @@ const Navigation = () => {
                   <Store className="h-4 w-4 mr-2" />
                   Sell Now
                 </Button>
+                <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
               </>
             ) : (
               <>
