@@ -28,6 +28,7 @@ import {
   Star,
   Package
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ProfileDropdownProps {
   user: {
@@ -44,12 +45,14 @@ interface ProfileDropdownProps {
     storeRevenue?: number;
     storeRating?: number;
     completedSales?: number;
+    isVendor?: boolean;
+    isCustomer?: boolean;
   };
-  onSignOut?: () => void;
 }
 
-const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
+const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { signOut } = useAuth();
 
   const getInitials = (name: string) => {
     return name
@@ -246,7 +249,7 @@ const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
           <DropdownMenuItem 
             className="px-4 py-2.5 cursor-pointer hover:bg-destructive/10 focus:bg-destructive/10 text-destructive"
             onClick={() => {
-              onSignOut?.();
+              signOut();
               setIsOpen(false);
             }}
           >

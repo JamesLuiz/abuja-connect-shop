@@ -4,11 +4,13 @@ import { Menu, X, Search, ShoppingCart, Store, User } from 'lucide-react';
 import ProfileDropdown from '@/components/ui/ProfileDropdown';
 import CartSidebar from '@/components/cart/CartSidebar';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, isAuthenticated } = useAuth();
 
   const navItems = [
     { name: 'Home', href: '#home', type: 'scroll' },
@@ -18,26 +20,6 @@ const Navigation = () => {
     { name: 'About', href: '#about', type: 'scroll' },
     { name: 'Contact', href: '#contact', type: 'scroll' }
   ];
-
-  // Mock user data - in real app this would come from auth context
-  const mockUser = {
-    name: 'Adebayo Johnson',
-    email: 'adebayo.johnson@gmail.com',
-    avatar: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=100&h=100&fit=crop&crop=face',
-    role: 'vendor' as const,
-    isVerified: true,
-    phone: '+234 809 123 4567',
-    location: 'Abuja, FCT',
-    joinDate: 'March 2023',
-    storeRevenue: 2450000,
-    storeRating: 4.8,
-    completedSales: 342
-  };
-
-  const handleSignOut = () => {
-    console.log('User signed out');
-    // Handle sign out logic
-  };
 
   const handleNavClick = (item) => {
     if (item.type === 'route') {
@@ -104,21 +86,57 @@ const Navigation = () => {
           {/* Right side buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <CartSidebar />
-            <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
-            <Button 
-              variant="accent" 
-              size="sm"
-              onClick={() => navigate('/vendor/register')}
-            >
-              <Store className="h-4 w-4 mr-2" />
-              Sell Now
-            </Button>
+            
+            {isAuthenticated && user ? (
+              <>
+                <ProfileDropdown user={user} />
+                {!user.isVendor && (
+                  <Button 
+                    variant="accent" 
+                    size="sm"
+                    onClick={() => navigate('/vendor/register')}
+                  >
+                    <Store className="h-4 w-4 mr-2" />
+                    Sell Now
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => navigate('/signin')}
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  onClick={() => navigate('/signup')}
+                >
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile right section - Profile and Cart outside hamburger */}
           <div className="md:hidden flex items-center space-x-2">
             <CartSidebar />
-            <ProfileDropdown user={mockUser} onSignOut={handleSignOut} />
+            
+            {isAuthenticated && user ? (
+              <ProfileDropdown user={user} />
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate('/signin')}
+              >
+                Sign In
+              </Button>
+            )}
+            
             <Button
               variant="ghost"
               size="icon"
@@ -146,15 +164,38 @@ const Navigation = () => {
             ))}
             <div className="pt-4 pb-3 border-t border-border">
               <div className="flex justify-center px-3">
-                <Button 
-                  variant="accent" 
-                  size="sm" 
-                  className="w-full"
-                  onClick={() => navigate('/vendor/register')}
-                >
-                  <Store className="h-4 w-4 mr-2" />
-                  Sell Now
-                </Button>
+                {isAuthenticated && user ? (
+                  !user.isVendor && (
+                    <Button 
+                      variant="accent" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => navigate('/vendor/register')}
+                    >
+                      <Store className="h-4 w-4 mr-2" />
+                      Sell Now
+                    </Button>
+                  )
+                ) : (
+                  <div className="flex gap-2 w-full">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => navigate('/signin')}
+                    >
+                      Sign In
+                    </Button>
+                    <Button 
+                      variant="default" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => navigate('/signup')}
+                    >
+                      Sign Up
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
