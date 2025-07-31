@@ -19,20 +19,20 @@ import {
 const Footer = () => {
   const quickLinks = [
     { name: 'About Us', href: '#about' },
-    { name: 'How It Works', href: '#how-it-works' },
-    { name: 'Vendor Program', href: '#vendors' },
-    { name: 'Customer Support', href: '#support' },
-    { name: 'Blog', href: '#blog' },
-    { name: 'Careers', href: '#careers' }
+    { name: 'How It Works', href: '/how-it-works' },
+    { name: 'Vendor Program', href: '/vendor-program' },
+    { name: 'Customer Support', href: '/customer-support' },
+    { name: 'Blog', href: '/blog' },
+    { name: 'Careers', href: '/careers' }
   ];
 
   const categories = [
-    { name: 'Electronics', href: '/vendor/electronics' },
-    { name: 'Fashion & Style', href: '/vendor/fashion' },
-    { name: 'Home & Garden', href: '/vendor/home-garden' },
-    { name: 'Beauty & Health', href: '/vendor/beauty' },
-    { name: 'Sports & Fitness', href: '/vendor/sports' },
-    { name: 'Books & Media', href: '/vendor/books' }
+    { name: 'Electronics', href: '/category/electronics' },
+    { name: 'Fashion & Style', href: '/category/fashion' },
+    { name: 'Home & Garden', href: '/category/home-garden' },
+    { name: 'Beauty & Health', href: '/category/beauty' },
+    { name: 'Sports & Fitness', href: '/category/sports' },
+    { name: 'Books & Media', href: '/category/books' }
   ];
 
   const services = [

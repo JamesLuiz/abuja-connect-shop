@@ -17,6 +17,12 @@ import VendorSettings from "@/pages/VendorSettings";
 import HelpSupport from "@/pages/HelpSupport";
 import EditProfile from "@/pages/EditProfile";
 import AddProduct from "@/pages/AddProduct";
+import HowItWorks from "@/pages/HowItWorks";
+import VendorProgram from "@/pages/VendorProgram";
+import CustomerSupport from "@/pages/CustomerSupport";
+import Blog from "@/pages/Blog";
+import Careers from "@/pages/Careers";
+import CategoryVendors from "@/pages/CategoryVendors";
 import { CartProvider } from "@/contexts/CartContext";
 const queryClient = new QueryClient();
 
@@ -41,6 +47,12 @@ const App = () => (
             <Route path="/help" element={<HelpSupport />} />
             <Route path="/profile/edit" element={<EditProfile />} />
             <Route path="/add-product" element={<AddProduct />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/vendor-program" element={<VendorProgram />} />
+            <Route path="/customer-support" element={<CustomerSupport />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/category/:category" element={<CategoryVendors />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} /> 
           </Routes>
