@@ -159,8 +159,8 @@ const ProductShowcase = () => {
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Explore curated collections from trusted Abuja vendors. Each vendor showcases 
-            their best-selling products and complete catalogue.
+            Discover luxury collections from trusted vendors nearest to you. Rich quality, original products 
+            with fast delivery. Find affordable luxury from Abuja's finest businesses.
           </p>
         </div>
 

@@ -1,14 +1,15 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+
+# High priority pages for SEO
+Allow: /vendor/*
+Allow: /category/*
+Allow: /products/*
+Allow: /blog/*
+Allow: /how-it-works
+Allow: /vendor-program
+
+# Sitemap location
+Sitemap: https://abuja-e-mall.com/sitemap.xml
+
+# SEO Keywords: luxury shopping, trusted vendors Abuja, fast delivery, rich quality products, original items, affordable luxury, nearest vendors, premium marketplace Nigeria

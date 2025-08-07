@@ -32,14 +32,14 @@ const Hero = () => {
             <div className="animate-fade-in">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
                 <span className="bg-gradient-primary bg-clip-text text-transparent">
-                  Sell Anywhere,
+                  Discover Luxury,
                 </span>
                 <br />
-                <span className="text-foreground">Buy Easy</span>
+                <span className="text-foreground">Rich Quality</span>
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl">
-                Nigeria's premier marketplace connecting Abuja businesses with customers nationwide. 
-                Start selling in minutes or discover amazing products from local vendors.
+                Shop original, luxury products from trusted vendors in Abuja. Fast delivery of rich quality items, 
+                affordable luxury nearest to you. Discover the best marketplace for premium goods.
               </p>
             </div>
 
@@ -88,8 +88,8 @@ const Hero = () => {
                   </div>
                 </div>
                 <p className="text-muted-foreground">
-                  Create your digital storefront in minutes. Reach customers across Nigeria 
-                  with our integrated payment and delivery solutions.
+                  Sell luxury, original products to customers nationwide. Fast delivery, rich quality items 
+                  with our premium vendor marketplace platform.
                 </p>
               </div>
 
@@ -104,8 +104,8 @@ const Hero = () => {
                   </div>
                 </div>
                 <p className="text-muted-foreground">
-                  Shop from verified Abuja businesses. Enjoy fast delivery, secure payments, 
-                  and quality products from trusted local vendors.
+                  Discover luxury products from trusted vendors nearest to you. Original, rich quality items 
+                  with fast delivery and affordable luxury shopping experience.
                 </p>
               </div>
             </div>

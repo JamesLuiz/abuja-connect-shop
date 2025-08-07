@@ -4,23 +4,23 @@ const About = () => {
   const features = [
     {
       icon: Shield,
-      title: 'Verified Vendors',
-      description: 'All vendors go through our comprehensive verification process to ensure quality and authenticity.'
+      title: 'Trusted Vendors Only',
+      description: 'Rigorously verified vendors offering original, luxury products with guaranteed rich quality and authenticity.'
     },
     {
       icon: Truck,
-      title: 'Fast Delivery',
-      description: 'Lightning-fast delivery across Abuja with our integrated logistics partners including InDrive.'
+      title: 'Lightning Fast Delivery',
+      description: 'Ultra-fast delivery nearest to you across Abuja. Premium logistics ensuring your luxury items arrive quickly.'
     },
     {
       icon: CreditCard,
-      title: 'Secure Payments',
-      description: 'Multiple payment options with bank-level security. Pay with cards, bank transfers, or mobile money.'
+      title: 'Secure Luxury Payments',
+      description: 'Bank-grade security for premium transactions. Multiple payment options for your luxury shopping experience.'
     },
     {
       icon: Users,
-      title: 'Customer Support',
-      description: '24/7 customer support to help with orders, returns, and any questions you might have.'
+      title: 'Premium Customer Care',
+      description: 'Dedicated support for luxury shoppers. 24/7 assistance ensuring the best quality shopping experience.'
     }
   ];
 
@@ -40,9 +40,9 @@ const About = () => {
             About <span className="bg-gradient-primary bg-clip-text text-transparent">Abuja E-Mall</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            We're revolutionizing e-commerce in Nigeria by connecting Abuja's finest businesses 
-            with customers nationwide. Our platform empowers local entrepreneurs while providing 
-            shoppers with authentic, quality products.
+            Discover luxury shopping in Abuja's premier marketplace. We connect trusted vendors with customers 
+            seeking rich quality, original products. Experience fast delivery of affordable luxury items 
+            from the finest businesses nearest to you.
           </p>
         </div>
 
@@ -52,9 +52,9 @@ const About = () => {
             <div>
               <h3 className="text-2xl font-bold text-foreground mb-4">Our Mission</h3>
               <p className="text-muted-foreground mb-6">
-                To democratize e-commerce in Nigeria by providing a platform where every business, 
-                regardless of size, can reach customers nationwide. We believe in empowering local 
-                entrepreneurs and bringing authentic Nigerian products to the digital marketplace.
+                To provide Nigeria's most trusted marketplace for luxury shopping. We connect discerning customers 
+                with verified vendors offering original, rich quality products. Experience fast delivery of 
+                affordable luxury from the best vendors nearest to you in Abuja.
               </p>
               <div className="flex items-center space-x-4">
                 <div className="flex items-center">

@@ -9,33 +9,33 @@ const VendorSignup = () => {
   const features = [
     {
       icon: Store,
-      title: 'Custom Storefront',
-      description: 'Create your branded online store with customizable themes and layouts'
+      title: 'Luxury Storefront',
+      description: 'Showcase your rich quality, original products with premium branding and luxury marketplace presence'
     },
     {
       icon: CreditCard,
-      title: 'Instant Payments',
-      description: 'Get paid immediately with our integrated payment processing system'
+      title: 'Premium Payments',
+      description: 'Instant payments for luxury transactions with trusted, secure processing for high-value items'
     },
     {
       icon: Truck,
-      title: 'Delivery Integration',
-      description: 'Automatic delivery assignment through Bolt and Uber partnerships'
+      title: 'Fast Premium Delivery',
+      description: 'Lightning-fast delivery nearest to customers. Premium logistics for luxury products across Abuja'
     },
     {
       icon: BarChart,
-      title: 'Analytics Dashboard',
-      description: 'Track sales, customers, and performance with detailed insights'
+      title: 'Rich Analytics',
+      description: 'Track luxury sales, discover customer preferences, and optimize your premium product offerings'
     },
     {
       icon: Shield,
-      title: 'Secure Platform',
-      description: 'Enterprise-grade security to protect your business and customers'
+      title: 'Trusted Platform',
+      description: 'Enterprise security protecting your luxury business and affluent customers with premium safety'
     },
     {
       icon: Headphones,
-      title: '24/7 Support',
-      description: 'Round-the-clock customer support and AI-powered assistance'
+      title: 'Premium Support',
+      description: 'Dedicated support for luxury vendors. Expert assistance for high-quality customer experiences'
     }
   ];
 
@@ -62,8 +62,8 @@ const VendorSignup = () => {
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Join thousands of successful vendors on Abuja E-Mall. Get your business online 
-            in minutes and start reaching customers across Nigeria.
+            Join trusted vendors selling luxury, original products on Abuja's premier marketplace. 
+            Offer rich quality items with fast delivery to customers seeking affordable luxury nearest to them.
           </p>
         </div>
 
@@ -147,8 +147,8 @@ const VendorSignup = () => {
               Ready to Transform Your Business?
             </h3>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join the digital marketplace revolution. Start selling online today and 
-              reach customers you never thought possible.
+              Join Abuja's premier luxury marketplace. Sell original, rich quality products with fast delivery 
+              to customers seeking affordable luxury nearest to them.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="lg" className="px-8" onClick={() => navigate('/vendor/register')}>

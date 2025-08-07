@@ -64,8 +64,8 @@ const Footer = () => {
                   Abuja E-Mall
                 </h3>
                 <p className="text-secondary-foreground/80 mb-4">
-                  Nigeria's premier marketplace connecting Abuja businesses with customers nationwide. 
-                  Sell anywhere, buy easy.
+                  Discover luxury shopping in Abuja's premier marketplace. Rich quality, original products 
+                  with fast delivery from trusted vendors nearest to you.
                 </p>
               </div>
               
@@ -140,7 +140,7 @@ const Footer = () => {
             <div>
               <h4 className="text-lg font-semibold mb-6">Stay Updated</h4>
               <p className="text-secondary-foreground/80 mb-4">
-                Get the latest deals and vendor updates delivered to your inbox.
+                Discover luxury deals, rich quality products, and exclusive offers from trusted vendors nearest to you.
               </p>
               
               <div className="space-y-3 mb-6">
