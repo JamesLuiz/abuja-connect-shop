@@ -32,10 +32,10 @@ const Hero = () => {
             <div className="animate-fade-in">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
                 <span className="bg-gradient-primary bg-clip-text text-transparent">
-                  Discover Luxury,
+                  Sell Anywhere,
                 </span>
                 <br />
-                <span className="text-foreground">Rich Quality</span>
+                <span className="text-foreground">Buy Easy</span>
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl">
                 Shop original, luxury products from trusted vendors in Abuja. Fast delivery of rich quality items, 
