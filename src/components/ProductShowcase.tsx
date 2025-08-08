@@ -406,7 +406,12 @@ const ProductShowcase = () => {
 
         {/* View More */}
         <div className="text-center">
-          <Button variant="outline" size="lg" className="px-8">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="px-8"
+            onClick={() => window.location.href = '/vendors'}
+          >
             View All Vendors
           </Button>
         </div>

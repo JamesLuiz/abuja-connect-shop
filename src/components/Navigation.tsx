@@ -92,15 +92,14 @@ const Navigation = () => {
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="pl-10 pr-4 py-2 bg-muted/50 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
-              />
+          {/* Aesthetic Elements */}
+          <div className="hidden lg:flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <div className="h-2 w-2 rounded-full bg-primary animate-glow-pulse"></div>
+              <span className="text-xs text-muted-foreground">Live</span>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              🇳🇬 Abuja's #1 Marketplace
             </div>
           </div>
 
