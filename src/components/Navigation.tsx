@@ -75,7 +75,7 @@ const Navigation = () => {
               >
                 <img src={logoImage} alt="SellAnywhere Logo" className="h-10 w-10" />
                 <span className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  SellAnywhere
+                  Abuja E-mall
                 </span>
               </button>
             </div>
