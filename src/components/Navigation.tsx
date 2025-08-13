@@ -4,6 +4,7 @@ import { Menu, X, Search, Store } from 'lucide-react';
 import ProfileDropdown from '@/components/ui/ProfileDropdown';
 import CartSidebar from '@/components/cart/CartSidebar';
 import { useNavigate, useLocation } from 'react-router-dom';
+import logoImage from '@/assets/logos/logo-modern-minimalist.png';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -70,9 +71,12 @@ const Navigation = () => {
             <div className="flex-shrink-0">
               <button
                 onClick={() => navigate('/')}
-                className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+                className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
               >
-                Abuja E-Mall
+                <img src={logoImage} alt="SellAnywhere Logo" className="h-10 w-10" />
+                <span className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  SellAnywhere
+                </span>
               </button>
             </div>
           </div>
