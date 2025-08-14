@@ -31,7 +31,20 @@ import {
   Clock,
   Server,
   Wifi,
-  Database
+  Database,
+  Flag,
+  Ban,
+  MessageSquare,
+  FileText,
+  Shield,
+  CheckCircle,
+  XCircle,
+  Mail,
+  Phone,
+  Calendar,
+  MapPin,
+  Star,
+  MoreHorizontal
 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
@@ -77,9 +90,35 @@ const AdminDashboard = () => {
     network: { status: "healthy", bandwidth: "850Mbps", latency: "12ms" }
   };
 
+  // Mock data for users
+  const users = [
+    { id: 1, name: "John Doe", email: "john@example.com", status: "active", orders: 23, joined: "2024-01-15", location: "Abuja", phone: "+234 901 234 5678" },
+    { id: 2, name: "Jane Smith", email: "jane@example.com", status: "flagged", orders: 12, joined: "2024-02-10", location: "Lagos", phone: "+234 802 345 6789" },
+    { id: 3, name: "Mike Johnson", email: "mike@example.com", status: "banned", orders: 5, joined: "2024-03-05", location: "Kano", phone: "+234 703 456 7890" },
+    { id: 4, name: "Sarah Wilson", email: "sarah@example.com", status: "active", orders: 45, joined: "2023-12-20", location: "Abuja", phone: "+234 805 567 8901" }
+  ];
+
+  // Mock data for disputes
+  const disputes = [
+    { id: 1, orderId: "ORD-2024-001", buyer: "John Doe", vendor: "TechHub Nigeria", amount: "₦25,000", status: "pending", type: "refund", created: "2024-01-20", description: "Product not as described" },
+    { id: 2, orderId: "ORD-2024-002", buyer: "Jane Smith", vendor: "Fashion Forward", amount: "₦15,000", status: "resolved", type: "quality", created: "2024-01-18", description: "Wrong size delivered" },
+    { id: 3, orderId: "ORD-2024-003", buyer: "Mike Johnson", vendor: "Home Essentials", amount: "₦8,500", status: "escalated", type: "delivery", created: "2024-01-22", description: "Item never arrived" },
+    { id: 4, orderId: "ORD-2024-004", buyer: "Sarah Wilson", vendor: "Sports Zone", amount: "₦12,000", status: "pending", type: "damage", created: "2024-01-21", description: "Package damaged during shipping" }
+  ];
+
   const handleDeleteVendor = (vendorId: number) => {
     console.log(`Deleting vendor ${vendorId}`);
     // Implement actual deletion logic
+  };
+
+  const handleUserAction = (userId: number, action: string) => {
+    console.log(`${action} user ${userId}`);
+    // Implement user action logic
+  };
+
+  const handleDisputeAction = (disputeId: number, action: string) => {
+    console.log(`${action} dispute ${disputeId}`);
+    // Implement dispute action logic
   };
 
   return (
@@ -143,9 +182,11 @@ const AdminDashboard = () => {
 
         {/* Main Dashboard Tabs */}
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="vendors">Vendors</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="disputes">Disputes</TabsTrigger>
             <TabsTrigger value="sales">Sales</TabsTrigger>
             <TabsTrigger value="payments">Payments</TabsTrigger>
             <TabsTrigger value="traffic">Traffic</TabsTrigger>
@@ -265,6 +306,235 @@ const AdminDashboard = () => {
                                     </AlertDialogFooter>
                                   </AlertDialogContent>
                                 </AlertDialog>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Users Tab */}
+          <TabsContent value="users" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>Manage user accounts and monitor activity</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Input placeholder="Search users..." className="max-w-sm" />
+                    <Button variant="outline">Search</Button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-border">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2">User</th>
+                          <th className="text-left p-2">Status</th>
+                          <th className="text-left p-2">Orders</th>
+                          <th className="text-left p-2">Location</th>
+                          <th className="text-left p-2">Joined</th>
+                          <th className="text-left p-2">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {users.map((user) => (
+                          <tr key={user.id} className="border-b">
+                            <td className="p-2">
+                              <div>
+                                <div className="font-medium">{user.name}</div>
+                                <div className="text-sm text-muted-foreground flex items-center">
+                                  <Mail className="w-3 h-3 mr-1" />
+                                  {user.email}
+                                </div>
+                                <div className="text-sm text-muted-foreground flex items-center">
+                                  <Phone className="w-3 h-3 mr-1" />
+                                  {user.phone}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="p-2">
+                              <Badge 
+                                variant={
+                                  user.status === "active" ? "default" : 
+                                  user.status === "flagged" ? "secondary" : "destructive"
+                                }
+                              >
+                                {user.status}
+                              </Badge>
+                            </td>
+                            <td className="p-2">{user.orders}</td>
+                            <td className="p-2">
+                              <div className="flex items-center text-sm">
+                                <MapPin className="w-3 h-3 mr-1" />
+                                {user.location}
+                              </div>
+                            </td>
+                            <td className="p-2">
+                              <div className="flex items-center text-sm">
+                                <Calendar className="w-3 h-3 mr-1" />
+                                {user.joined}
+                              </div>
+                            </td>
+                            <td className="p-2">
+                              <div className="flex space-x-2">
+                                <Button variant="outline" size="sm" onClick={() => handleUserAction(user.id, "view")}>
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                <Button variant="secondary" size="sm" onClick={() => handleUserAction(user.id, "flag")}>
+                                  <Flag className="w-4 h-4" />
+                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="sm">
+                                      <Ban className="w-4 h-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Ban User</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to ban {user.name}? This will suspend their account access.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleUserAction(user.id, "ban")}>
+                                        Ban User
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Disputes Tab */}
+          <TabsContent value="disputes" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-4 mb-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Disputes</CardTitle>
+                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">47</div>
+                  <p className="text-xs text-muted-foreground">+12% from last month</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Pending</CardTitle>
+                  <Clock className="h-4 w-4 text-yellow-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-yellow-600">23</div>
+                  <p className="text-xs text-muted-foreground">Needs attention</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Resolved</CardTitle>
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">18</div>
+                  <p className="text-xs text-muted-foreground">This month</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Escalated</CardTitle>
+                  <AlertTriangle className="h-4 w-4 text-red-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-red-600">6</div>
+                  <p className="text-xs text-muted-foreground">High priority</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Dispute Management</CardTitle>
+                <CardDescription>Handle customer disputes and resolutions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Input placeholder="Search disputes..." className="max-w-sm" />
+                    <Button variant="outline">Search</Button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-border">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2">Order ID</th>
+                          <th className="text-left p-2">Parties</th>
+                          <th className="text-left p-2">Type</th>
+                          <th className="text-left p-2">Amount</th>
+                          <th className="text-left p-2">Status</th>
+                          <th className="text-left p-2">Created</th>
+                          <th className="text-left p-2">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {disputes.map((dispute) => (
+                          <tr key={dispute.id} className="border-b">
+                            <td className="p-2">
+                              <div className="font-medium">{dispute.orderId}</div>
+                              <div className="text-xs text-muted-foreground">{dispute.description}</div>
+                            </td>
+                            <td className="p-2">
+                              <div className="text-sm">
+                                <div>Buyer: {dispute.buyer}</div>
+                                <div>Vendor: {dispute.vendor}</div>
+                              </div>
+                            </td>
+                            <td className="p-2">
+                              <Badge variant="outline">{dispute.type}</Badge>
+                            </td>
+                            <td className="p-2 font-medium">{dispute.amount}</td>
+                            <td className="p-2">
+                              <Badge 
+                                variant={
+                                  dispute.status === "resolved" ? "default" : 
+                                  dispute.status === "escalated" ? "destructive" : "secondary"
+                                }
+                              >
+                                {dispute.status}
+                              </Badge>
+                            </td>
+                            <td className="p-2 text-sm">{dispute.created}</td>
+                            <td className="p-2">
+                              <div className="flex space-x-2">
+                                <Button variant="outline" size="sm" onClick={() => handleDisputeAction(dispute.id, "view")}>
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                {dispute.status === "pending" && (
+                                  <>
+                                    <Button variant="default" size="sm" onClick={() => handleDisputeAction(dispute.id, "resolve")}>
+                                      <CheckCircle className="w-4 h-4" />
+                                    </Button>
+                                    <Button variant="destructive" size="sm" onClick={() => handleDisputeAction(dispute.id, "escalate")}>
+                                      <AlertTriangle className="w-4 h-4" />
+                                    </Button>
+                                  </>
+                                )}
                               </div>
                             </td>
                           </tr>
