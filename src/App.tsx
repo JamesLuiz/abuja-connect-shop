@@ -28,6 +28,7 @@ import JobDetails from "@/pages/JobDetails";
 import CategoryVendors from "@/pages/CategoryVendors";
 import VendorsMarketplace from "@/pages/VendorsMarketplace";
 import Login from "@/pages/Login";
+import AdminDashboard from "@/pages/AdminDashboard";
 import { CartProvider } from "@/contexts/CartContext";
 const queryClient = new QueryClient();
 
@@ -63,8 +64,9 @@ const App = () => (
             <Route path="/category/:category" element={<CategoryVendors />} />
             <Route path="/vendors" element={<VendorsMarketplace />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} /> 
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
