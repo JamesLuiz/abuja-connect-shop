@@ -44,12 +44,23 @@ import {
   Calendar,
   MapPin,
   Star,
-  MoreHorizontal
+  MoreHorizontal,
+  UserX,
+  AlertCircle,
+  Pause,
+  Play
 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 const AdminDashboard = () => {
   const [selectedVendor, setSelectedVendor] = useState<string | null>(null);
+  const [flagReason, setFlagReason] = useState("");
+  const [suspendReason, setSuspendReason] = useState("");
+  const [disputeNotes, setDisputeNotes] = useState("");
 
   // Mock data for demonstration
   const salesData = [
@@ -111,14 +122,23 @@ const AdminDashboard = () => {
     // Implement actual deletion logic
   };
 
-  const handleUserAction = (userId: number, action: string) => {
-    console.log(`${action} user ${userId}`);
-    // Implement user action logic
+  const handleVendorAction = (vendorId: number, action: string, reason?: string) => {
+    console.log(`${action} vendor ${vendorId}`, reason ? `Reason: ${reason}` : '');
+    // Implement vendor action logic
+    setFlagReason("");
+    setSuspendReason("");
   };
 
-  const handleDisputeAction = (disputeId: number, action: string) => {
-    console.log(`${action} dispute ${disputeId}`);
+  const handleUserAction = (userId: number, action: string, reason?: string) => {
+    console.log(`${action} user ${userId}`, reason ? `Reason: ${reason}` : '');
+    // Implement user action logic
+    setFlagReason("");
+  };
+
+  const handleDisputeAction = (disputeId: number, action: string, notes?: string) => {
+    console.log(`${action} dispute ${disputeId}`, notes ? `Notes: ${notes}` : '');
     // Implement dispute action logic
+    setDisputeNotes("");
   };
 
   return (
@@ -281,31 +301,251 @@ const AdminDashboard = () => {
                             <td className="p-2">{vendor.sales}</td>
                             <td className="p-2">{vendor.orders}</td>
                             <td className="p-2">
-                              <div className="flex space-x-2">
-                                <Button variant="outline" size="sm">
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" size="sm">
-                                      <UserMinus className="w-4 h-4" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Delete Vendor</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to delete {vendor.name}? This action cannot be undone.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                      <AlertDialogAction onClick={() => handleDeleteVendor(vendor.id)}>
-                                        Delete
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
+                              <div className="flex space-x-1 md:space-x-2">
+                                {/* Mobile View - Dropdown */}
+                                <div className="md:hidden">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="outline" size="sm">
+                                        <MoreHorizontal className="w-4 h-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-48">
+                                      <DropdownMenuItem onClick={() => console.log('View vendor')}>
+                                        <Eye className="w-4 h-4 mr-2" />
+                                        View Details
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                      
+                                      {/* Flag Vendor */}
+                                      <Sheet>
+                                        <SheetTrigger asChild>
+                                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                            <Flag className="w-4 h-4 mr-2" />
+                                            Flag Vendor
+                                          </DropdownMenuItem>
+                                        </SheetTrigger>
+                                        <SheetContent>
+                                          <SheetHeader>
+                                            <SheetTitle>Flag Vendor: {vendor.name}</SheetTitle>
+                                            <SheetDescription>
+                                              Provide a reason for flagging this vendor
+                                            </SheetDescription>
+                                          </SheetHeader>
+                                          <div className="space-y-4 mt-4">
+                                            <div>
+                                              <Label htmlFor="flag-reason">Reason for flagging</Label>
+                                              <Textarea 
+                                                id="flag-reason"
+                                                placeholder="Enter reason for flagging..."
+                                                value={flagReason}
+                                                onChange={(e) => setFlagReason(e.target.value)}
+                                                className="mt-2"
+                                              />
+                                            </div>
+                                            <Button 
+                                              onClick={() => handleVendorAction(vendor.id, "flag", flagReason)}
+                                              className="w-full"
+                                              disabled={!flagReason.trim()}
+                                            >
+                                              Flag Vendor
+                                            </Button>
+                                          </div>
+                                        </SheetContent>
+                                      </Sheet>
+
+                                      {/* Suspend Vendor */}
+                                      <Sheet>
+                                        <SheetTrigger asChild>
+                                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                            <Pause className="w-4 h-4 mr-2" />
+                                            {vendor.status === "suspended" ? "Activate" : "Suspend"}
+                                          </DropdownMenuItem>
+                                        </SheetTrigger>
+                                        <SheetContent>
+                                          <SheetHeader>
+                                            <SheetTitle>
+                                              {vendor.status === "suspended" ? "Activate" : "Suspend"} Vendor: {vendor.name}
+                                            </SheetTitle>
+                                            <SheetDescription>
+                                              {vendor.status === "suspended" 
+                                                ? "Reactivate this vendor account"
+                                                : "Provide a reason for suspending this vendor"
+                                              }
+                                            </SheetDescription>
+                                          </SheetHeader>
+                                          {vendor.status !== "suspended" && (
+                                            <div className="space-y-4 mt-4">
+                                              <div>
+                                                <Label htmlFor="suspend-reason">Reason for suspension</Label>
+                                                <Textarea 
+                                                  id="suspend-reason"
+                                                  placeholder="Enter reason for suspension..."
+                                                  value={suspendReason}
+                                                  onChange={(e) => setSuspendReason(e.target.value)}
+                                                  className="mt-2"
+                                                />
+                                              </div>
+                                            </div>
+                                          )}
+                                          <Button 
+                                            onClick={() => handleVendorAction(
+                                              vendor.id, 
+                                              vendor.status === "suspended" ? "activate" : "suspend",
+                                              vendor.status === "suspended" ? undefined : suspendReason
+                                            )}
+                                            className="w-full mt-4"
+                                            disabled={vendor.status !== "suspended" && !suspendReason.trim()}
+                                          >
+                                            {vendor.status === "suspended" ? "Activate" : "Suspend"} Vendor
+                                          </Button>
+                                        </SheetContent>
+                                      </Sheet>
+
+                                      <DropdownMenuSeparator />
+                                      
+                                      {/* Delete Vendor */}
+                                      <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive">
+                                            <UserMinus className="w-4 h-4 mr-2" />
+                                            Delete Vendor
+                                          </DropdownMenuItem>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                            <AlertDialogTitle>Delete Vendor</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                              Are you sure you want to delete {vendor.name}? This action cannot be undone.
+                                            </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDeleteVendor(vendor.id)}>
+                                              Delete
+                                            </AlertDialogAction>
+                                          </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+
+                                {/* Desktop View - Individual Buttons */}
+                                <div className="hidden md:flex space-x-2">
+                                  <Button variant="outline" size="sm" onClick={() => console.log('View vendor')}>
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+                                  
+                                  {/* Flag Button */}
+                                  <Sheet>
+                                    <SheetTrigger asChild>
+                                      <Button variant="secondary" size="sm">
+                                        <Flag className="w-4 h-4" />
+                                      </Button>
+                                    </SheetTrigger>
+                                    <SheetContent>
+                                      <SheetHeader>
+                                        <SheetTitle>Flag Vendor: {vendor.name}</SheetTitle>
+                                        <SheetDescription>
+                                          Provide a reason for flagging this vendor
+                                        </SheetDescription>
+                                      </SheetHeader>
+                                      <div className="space-y-4 mt-4">
+                                        <div>
+                                          <Label htmlFor="flag-reason">Reason for flagging</Label>
+                                          <Textarea 
+                                            id="flag-reason"
+                                            placeholder="Enter reason for flagging..."
+                                            value={flagReason}
+                                            onChange={(e) => setFlagReason(e.target.value)}
+                                            className="mt-2"
+                                          />
+                                        </div>
+                                        <Button 
+                                          onClick={() => handleVendorAction(vendor.id, "flag", flagReason)}
+                                          className="w-full"
+                                          disabled={!flagReason.trim()}
+                                        >
+                                          Flag Vendor
+                                        </Button>
+                                      </div>
+                                    </SheetContent>
+                                  </Sheet>
+
+                                  {/* Suspend/Activate Button */}
+                                  <Sheet>
+                                    <SheetTrigger asChild>
+                                      <Button 
+                                        variant={vendor.status === "suspended" ? "default" : "outline"} 
+                                        size="sm"
+                                      >
+                                        {vendor.status === "suspended" ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+                                      </Button>
+                                    </SheetTrigger>
+                                    <SheetContent>
+                                      <SheetHeader>
+                                        <SheetTitle>
+                                          {vendor.status === "suspended" ? "Activate" : "Suspend"} Vendor: {vendor.name}
+                                        </SheetTitle>
+                                        <SheetDescription>
+                                          {vendor.status === "suspended" 
+                                            ? "Reactivate this vendor account"
+                                            : "Provide a reason for suspending this vendor"
+                                          }
+                                        </SheetDescription>
+                                      </SheetHeader>
+                                      {vendor.status !== "suspended" && (
+                                        <div className="space-y-4 mt-4">
+                                          <div>
+                                            <Label htmlFor="suspend-reason">Reason for suspension</Label>
+                                            <Textarea 
+                                              id="suspend-reason"
+                                              placeholder="Enter reason for suspension..."
+                                              value={suspendReason}
+                                              onChange={(e) => setSuspendReason(e.target.value)}
+                                              className="mt-2"
+                                            />
+                                          </div>
+                                        </div>
+                                      )}
+                                      <Button 
+                                        onClick={() => handleVendorAction(
+                                          vendor.id, 
+                                          vendor.status === "suspended" ? "activate" : "suspend",
+                                          vendor.status === "suspended" ? undefined : suspendReason
+                                        )}
+                                        className="w-full mt-4"
+                                        disabled={vendor.status !== "suspended" && !suspendReason.trim()}
+                                      >
+                                        {vendor.status === "suspended" ? "Activate" : "Suspend"} Vendor
+                                      </Button>
+                                    </SheetContent>
+                                  </Sheet>
+
+                                  {/* Delete Button */}
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button variant="destructive" size="sm">
+                                        <UserMinus className="w-4 h-4" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Delete Vendor</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to delete {vendor.name}? This action cannot be undone.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDeleteVendor(vendor.id)}>
+                                          Delete
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </div>
                               </div>
                             </td>
                           </tr>
@@ -383,34 +623,195 @@ const AdminDashboard = () => {
                               </div>
                             </td>
                             <td className="p-2">
-                              <div className="flex space-x-2">
-                                <Button variant="outline" size="sm" onClick={() => handleUserAction(user.id, "view")}>
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                                <Button variant="secondary" size="sm" onClick={() => handleUserAction(user.id, "flag")}>
-                                  <Flag className="w-4 h-4" />
-                                </Button>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" size="sm">
-                                      <Ban className="w-4 h-4" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Ban User</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to ban {user.name}? This will suspend their account access.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                      <AlertDialogAction onClick={() => handleUserAction(user.id, "ban")}>
-                                        Ban User
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
+                              <div className="flex space-x-1 md:space-x-2">
+                                {/* Mobile View - Dropdown */}
+                                <div className="md:hidden">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="outline" size="sm">
+                                        <MoreHorizontal className="w-4 h-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-48">
+                                      <DropdownMenuItem onClick={() => handleUserAction(user.id, "view")}>
+                                        <Eye className="w-4 h-4 mr-2" />
+                                        View Profile
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                      
+                                      {/* Flag/Unflag User */}
+                                      <Sheet>
+                                        <SheetTrigger asChild>
+                                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                            <Flag className="w-4 h-4 mr-2" />
+                                            {user.status === "flagged" ? "Unflag User" : "Flag User"}
+                                          </DropdownMenuItem>
+                                        </SheetTrigger>
+                                        <SheetContent>
+                                          <SheetHeader>
+                                            <SheetTitle>
+                                              {user.status === "flagged" ? "Unflag" : "Flag"} User: {user.name}
+                                            </SheetTitle>
+                                            <SheetDescription>
+                                              {user.status === "flagged" 
+                                                ? "Remove flag from this user account"
+                                                : "Provide a reason for flagging this user"
+                                              }
+                                            </SheetDescription>
+                                          </SheetHeader>
+                                          {user.status !== "flagged" && (
+                                            <div className="space-y-4 mt-4">
+                                              <div>
+                                                <Label htmlFor="user-flag-reason">Reason for flagging</Label>
+                                                <Textarea 
+                                                  id="user-flag-reason"
+                                                  placeholder="Enter reason for flagging user..."
+                                                  value={flagReason}
+                                                  onChange={(e) => setFlagReason(e.target.value)}
+                                                  className="mt-2"
+                                                />
+                                              </div>
+                                            </div>
+                                          )}
+                                          <Button 
+                                            onClick={() => handleUserAction(
+                                              user.id, 
+                                              user.status === "flagged" ? "unflag" : "flag",
+                                              user.status === "flagged" ? undefined : flagReason
+                                            )}
+                                            className="w-full mt-4"
+                                            disabled={user.status !== "flagged" && !flagReason.trim()}
+                                          >
+                                            {user.status === "flagged" ? "Unflag" : "Flag"} User
+                                          </Button>
+                                        </SheetContent>
+                                      </Sheet>
+
+                                      <DropdownMenuSeparator />
+                                      
+                                      {/* Ban/Unban User */}
+                                      <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive">
+                                            <Ban className="w-4 h-4 mr-2" />
+                                            {user.status === "banned" ? "Unban User" : "Ban User"}
+                                          </DropdownMenuItem>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                            <AlertDialogTitle>
+                                              {user.status === "banned" ? "Unban" : "Ban"} User
+                                            </AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                              {user.status === "banned" 
+                                                ? `Are you sure you want to unban ${user.name}? They will regain access to the platform.`
+                                                : `Are you sure you want to ban ${user.name}? They will lose access to the platform.`
+                                              }
+                                            </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction 
+                                              onClick={() => handleUserAction(user.id, user.status === "banned" ? "unban" : "ban")}
+                                            >
+                                              {user.status === "banned" ? "Unban" : "Ban"}
+                                            </AlertDialogAction>
+                                          </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+
+                                {/* Desktop View - Individual Buttons */}
+                                <div className="hidden md:flex space-x-2">
+                                  <Button variant="outline" size="sm" onClick={() => handleUserAction(user.id, "view")}>
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+                                  
+                                  {/* Flag/Unflag Button */}
+                                  <Sheet>
+                                    <SheetTrigger asChild>
+                                      <Button 
+                                        variant={user.status === "flagged" ? "default" : "secondary"} 
+                                        size="sm"
+                                      >
+                                        <Flag className="w-4 h-4" />
+                                      </Button>
+                                    </SheetTrigger>
+                                    <SheetContent>
+                                      <SheetHeader>
+                                        <SheetTitle>
+                                          {user.status === "flagged" ? "Unflag" : "Flag"} User: {user.name}
+                                        </SheetTitle>
+                                        <SheetDescription>
+                                          {user.status === "flagged" 
+                                            ? "Remove flag from this user account"
+                                            : "Provide a reason for flagging this user"
+                                          }
+                                        </SheetDescription>
+                                      </SheetHeader>
+                                      {user.status !== "flagged" && (
+                                        <div className="space-y-4 mt-4">
+                                          <div>
+                                            <Label htmlFor="user-flag-reason">Reason for flagging</Label>
+                                            <Textarea 
+                                              id="user-flag-reason"
+                                              placeholder="Enter reason for flagging user..."
+                                              value={flagReason}
+                                              onChange={(e) => setFlagReason(e.target.value)}
+                                              className="mt-2"
+                                            />
+                                          </div>
+                                        </div>
+                                      )}
+                                      <Button 
+                                        onClick={() => handleUserAction(
+                                          user.id, 
+                                          user.status === "flagged" ? "unflag" : "flag",
+                                          user.status === "flagged" ? undefined : flagReason
+                                        )}
+                                        className="w-full mt-4"
+                                        disabled={user.status !== "flagged" && !flagReason.trim()}
+                                      >
+                                        {user.status === "flagged" ? "Unflag" : "Flag"} User
+                                      </Button>
+                                    </SheetContent>
+                                  </Sheet>
+
+                                  {/* Ban/Unban Button */}
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button 
+                                        variant={user.status === "banned" ? "default" : "destructive"} 
+                                        size="sm"
+                                      >
+                                        <Ban className="w-4 h-4" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                          {user.status === "banned" ? "Unban" : "Ban"} User
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          {user.status === "banned" 
+                                            ? `Are you sure you want to unban ${user.name}? They will regain access to the platform.`
+                                            : `Are you sure you want to ban ${user.name}? They will lose access to the platform.`
+                                          }
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction 
+                                          onClick={() => handleUserAction(user.id, user.status === "banned" ? "unban" : "ban")}
+                                        >
+                                          {user.status === "banned" ? "Unban" : "Ban"}
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </div>
                               </div>
                             </td>
                           </tr>
@@ -521,20 +922,282 @@ const AdminDashboard = () => {
                             </td>
                             <td className="p-2 text-sm">{dispute.created}</td>
                             <td className="p-2">
-                              <div className="flex space-x-2">
-                                <Button variant="outline" size="sm" onClick={() => handleDisputeAction(dispute.id, "view")}>
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                                {dispute.status === "pending" && (
-                                  <>
-                                    <Button variant="default" size="sm" onClick={() => handleDisputeAction(dispute.id, "resolve")}>
-                                      <CheckCircle className="w-4 h-4" />
-                                    </Button>
-                                    <Button variant="destructive" size="sm" onClick={() => handleDisputeAction(dispute.id, "escalate")}>
-                                      <AlertTriangle className="w-4 h-4" />
-                                    </Button>
-                                  </>
-                                )}
+                              <div className="flex space-x-1 md:space-x-2">
+                                {/* Mobile View - Dropdown */}
+                                <div className="md:hidden">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="outline" size="sm">
+                                        <MoreHorizontal className="w-4 h-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-48">
+                                      <DropdownMenuItem onClick={() => handleDisputeAction(dispute.id, "view")}>
+                                        <Eye className="w-4 h-4 mr-2" />
+                                        View Details
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                      
+                                      {dispute.status === "pending" && (
+                                        <>
+                                          {/* Resolve Dispute */}
+                                          <Sheet>
+                                            <SheetTrigger asChild>
+                                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                <CheckCircle className="w-4 h-4 mr-2" />
+                                                Resolve Dispute
+                                              </DropdownMenuItem>
+                                            </SheetTrigger>
+                                            <SheetContent>
+                                              <SheetHeader>
+                                                <SheetTitle>Resolve Dispute: {dispute.orderId}</SheetTitle>
+                                                <SheetDescription>
+                                                  Add resolution notes and mark this dispute as resolved
+                                                </SheetDescription>
+                                              </SheetHeader>
+                                              <div className="space-y-4 mt-4">
+                                                <div>
+                                                  <Label htmlFor="resolution-notes">Resolution Notes</Label>
+                                                  <Textarea 
+                                                    id="resolution-notes"
+                                                    placeholder="Enter resolution details..."
+                                                    value={disputeNotes}
+                                                    onChange={(e) => setDisputeNotes(e.target.value)}
+                                                    className="mt-2"
+                                                  />
+                                                </div>
+                                                <Button 
+                                                  onClick={() => handleDisputeAction(dispute.id, "resolve", disputeNotes)}
+                                                  className="w-full"
+                                                  disabled={!disputeNotes.trim()}
+                                                >
+                                                  Resolve Dispute
+                                                </Button>
+                                              </div>
+                                            </SheetContent>
+                                          </Sheet>
+
+                                          {/* Escalate Dispute */}
+                                          <Sheet>
+                                            <SheetTrigger asChild>
+                                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                <AlertTriangle className="w-4 h-4 mr-2" />
+                                                Escalate Dispute
+                                              </DropdownMenuItem>
+                                            </SheetTrigger>
+                                            <SheetContent>
+                                              <SheetHeader>
+                                                <SheetTitle>Escalate Dispute: {dispute.orderId}</SheetTitle>
+                                                <SheetDescription>
+                                                  Add escalation notes and mark this dispute for priority handling
+                                                </SheetDescription>
+                                              </SheetHeader>
+                                              <div className="space-y-4 mt-4">
+                                                <div>
+                                                  <Label htmlFor="escalation-notes">Escalation Notes</Label>
+                                                  <Textarea 
+                                                    id="escalation-notes"
+                                                    placeholder="Enter escalation reason..."
+                                                    value={disputeNotes}
+                                                    onChange={(e) => setDisputeNotes(e.target.value)}
+                                                    className="mt-2"
+                                                  />
+                                                </div>
+                                                <Button 
+                                                  onClick={() => handleDisputeAction(dispute.id, "escalate", disputeNotes)}
+                                                  className="w-full"
+                                                  variant="destructive"
+                                                  disabled={!disputeNotes.trim()}
+                                                >
+                                                  Escalate Dispute
+                                                </Button>
+                                              </div>
+                                            </SheetContent>
+                                          </Sheet>
+                                        </>
+                                      )}
+
+                                      {dispute.status === "escalated" && (
+                                        <Sheet>
+                                          <SheetTrigger asChild>
+                                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                              <Shield className="w-4 h-4 mr-2" />
+                                              Take Action
+                                            </DropdownMenuItem>
+                                          </SheetTrigger>
+                                          <SheetContent>
+                                            <SheetHeader>
+                                              <SheetTitle>Handle Escalated Dispute: {dispute.orderId}</SheetTitle>
+                                              <SheetDescription>
+                                                This dispute requires priority attention
+                                              </SheetDescription>
+                                            </SheetHeader>
+                                            <div className="space-y-4 mt-4">
+                                              <div>
+                                                <Label htmlFor="action-notes">Action Notes</Label>
+                                                <Textarea 
+                                                  id="action-notes"
+                                                  placeholder="Enter action taken..."
+                                                  value={disputeNotes}
+                                                  onChange={(e) => setDisputeNotes(e.target.value)}
+                                                  className="mt-2"
+                                                />
+                                              </div>
+                                              <div className="flex space-x-2">
+                                                <Button 
+                                                  onClick={() => handleDisputeAction(dispute.id, "resolve", disputeNotes)}
+                                                  className="flex-1"
+                                                  disabled={!disputeNotes.trim()}
+                                                >
+                                                  Resolve
+                                                </Button>
+                                                <Button 
+                                                  onClick={() => handleDisputeAction(dispute.id, "refund", disputeNotes)}
+                                                  className="flex-1"
+                                                  variant="secondary"
+                                                  disabled={!disputeNotes.trim()}
+                                                >
+                                                  Issue Refund
+                                                </Button>
+                                              </div>
+                                            </div>
+                                          </SheetContent>
+                                        </Sheet>
+                                      )}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+
+                                {/* Desktop View - Individual Buttons */}
+                                <div className="hidden md:flex space-x-2">
+                                  <Button variant="outline" size="sm" onClick={() => handleDisputeAction(dispute.id, "view")}>
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+                                  
+                                  {dispute.status === "pending" && (
+                                    <>
+                                      {/* Resolve Button */}
+                                      <Sheet>
+                                        <SheetTrigger asChild>
+                                          <Button variant="default" size="sm">
+                                            <CheckCircle className="w-4 h-4" />
+                                          </Button>
+                                        </SheetTrigger>
+                                        <SheetContent>
+                                          <SheetHeader>
+                                            <SheetTitle>Resolve Dispute: {dispute.orderId}</SheetTitle>
+                                            <SheetDescription>
+                                              Add resolution notes and mark this dispute as resolved
+                                            </SheetDescription>
+                                          </SheetHeader>
+                                          <div className="space-y-4 mt-4">
+                                            <div>
+                                              <Label htmlFor="resolution-notes">Resolution Notes</Label>
+                                              <Textarea 
+                                                id="resolution-notes"
+                                                placeholder="Enter resolution details..."
+                                                value={disputeNotes}
+                                                onChange={(e) => setDisputeNotes(e.target.value)}
+                                                className="mt-2"
+                                              />
+                                            </div>
+                                            <Button 
+                                              onClick={() => handleDisputeAction(dispute.id, "resolve", disputeNotes)}
+                                              className="w-full"
+                                              disabled={!disputeNotes.trim()}
+                                            >
+                                              Resolve Dispute
+                                            </Button>
+                                          </div>
+                                        </SheetContent>
+                                      </Sheet>
+
+                                      {/* Escalate Button */}
+                                      <Sheet>
+                                        <SheetTrigger asChild>
+                                          <Button variant="destructive" size="sm">
+                                            <AlertTriangle className="w-4 h-4" />
+                                          </Button>
+                                        </SheetTrigger>
+                                        <SheetContent>
+                                          <SheetHeader>
+                                            <SheetTitle>Escalate Dispute: {dispute.orderId}</SheetTitle>
+                                            <SheetDescription>
+                                              Add escalation notes and mark this dispute for priority handling
+                                            </SheetDescription>
+                                          </SheetHeader>
+                                          <div className="space-y-4 mt-4">
+                                            <div>
+                                              <Label htmlFor="escalation-notes">Escalation Notes</Label>
+                                              <Textarea 
+                                                id="escalation-notes"
+                                                placeholder="Enter escalation reason..."
+                                                value={disputeNotes}
+                                                onChange={(e) => setDisputeNotes(e.target.value)}
+                                                className="mt-2"
+                                              />
+                                            </div>
+                                            <Button 
+                                              onClick={() => handleDisputeAction(dispute.id, "escalate", disputeNotes)}
+                                              className="w-full"
+                                              variant="destructive"
+                                              disabled={!disputeNotes.trim()}
+                                            >
+                                              Escalate Dispute
+                                            </Button>
+                                          </div>
+                                        </SheetContent>
+                                      </Sheet>
+                                    </>
+                                  )}
+
+                                  {dispute.status === "escalated" && (
+                                    <Sheet>
+                                      <SheetTrigger asChild>
+                                        <Button variant="secondary" size="sm">
+                                          <Shield className="w-4 h-4" />
+                                        </Button>
+                                      </SheetTrigger>
+                                      <SheetContent>
+                                        <SheetHeader>
+                                          <SheetTitle>Handle Escalated Dispute: {dispute.orderId}</SheetTitle>
+                                          <SheetDescription>
+                                            This dispute requires priority attention
+                                          </SheetDescription>
+                                        </SheetHeader>
+                                        <div className="space-y-4 mt-4">
+                                          <div>
+                                            <Label htmlFor="action-notes">Action Notes</Label>
+                                            <Textarea 
+                                              id="action-notes"
+                                              placeholder="Enter action taken..."
+                                              value={disputeNotes}
+                                              onChange={(e) => setDisputeNotes(e.target.value)}
+                                              className="mt-2"
+                                            />
+                                          </div>
+                                          <div className="flex space-x-2">
+                                            <Button 
+                                              onClick={() => handleDisputeAction(dispute.id, "resolve", disputeNotes)}
+                                              className="flex-1"
+                                              disabled={!disputeNotes.trim()}
+                                            >
+                                              Resolve
+                                            </Button>
+                                            <Button 
+                                              onClick={() => handleDisputeAction(dispute.id, "refund", disputeNotes)}
+                                              className="flex-1"
+                                              variant="secondary"
+                                              disabled={!disputeNotes.trim()}
+                                            >
+                                              Issue Refund
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      </SheetContent>
+                                    </Sheet>
+                                  )}
+                                </div>
                               </div>
                             </td>
                           </tr>
