@@ -155,7 +155,11 @@ const ProductShowcase = () => {
         name: 'Fitness Tracker Watch',
         price: 32000,
         originalPrice: 40000,
-        image: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=400&h=400&fit=crop' },
+          { view: 'top', url: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=400&h=400&fit=crop' }
+        ],
         discount: 20
       },
       description: 'Everything you need for your fitness journey'
