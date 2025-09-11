@@ -2,10 +2,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, ShoppingCart, Heart, Eye, ArrowLeft, MapPin, Phone, Mail } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Eye, ArrowLeft, MapPin, Phone, Mail, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useCart } from '@/contexts/CartContext';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import ProductDetails from '@/components/ProductDetails';
 
 const VendorCatalogue = () => {
   const { vendorId } = useParams();
@@ -33,7 +35,14 @@ const VendorCatalogue = () => {
         originalPrice: 60000,
         rating: 4.8,
         reviews: 124,
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=400&h=400&fit=crop' },
+          { view: 'top', url: 'https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=400&h=400&fit=crop' },
+          { view: 'back', url: 'https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=400&h=400&fit=crop' },
+          { view: 'bottom', url: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=400&fit=crop' }
+        ],
+        description: 'Experience premium sound quality with our wireless headphones featuring active noise cancellation, 30-hour battery life, and crystal-clear audio. Perfect for music lovers and professionals who demand excellence.',
         discount: 25,
         inStock: true
       },
@@ -44,7 +53,14 @@ const VendorCatalogue = () => {
         originalPrice: 220000,
         rating: 4.7,
         reviews: 256,
-        image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1512499617640-c74ae3a79d37?w=400&h=400&fit=crop' },
+          { view: 'top', url: 'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=400&h=400&fit=crop' },
+          { view: 'back', url: 'https://images.unsplash.com/photo-1567581935884-3349723552ca?w=400&h=400&fit=crop' },
+          { view: 'bottom', url: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=400&fit=crop' }
+        ],
+        description: 'Latest generation smartphone with 128GB storage, triple camera system, and lightning-fast performance. Features include wireless charging, waterproof design, and all-day battery life.',
         discount: 18,
         inStock: true
       },
@@ -55,7 +71,14 @@ const VendorCatalogue = () => {
         originalPrice: 30000,
         rating: 4.6,
         reviews: 89,
-        image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?w=400&h=400&fit=crop' },
+          { view: 'top', url: 'https://images.unsplash.com/photo-1589003077984-894e133dabab?w=400&h=400&fit=crop' },
+          { view: 'back', url: 'https://images.unsplash.com/photo-1535360230580-ec38e4499144?w=400&h=400&fit=crop' },
+          { view: 'bottom', url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop' }
+        ],
+        description: 'Portable Bluetooth speaker with 360-degree sound, waterproof design, and 12-hour battery life. Perfect for outdoor adventures, parties, or home entertainment.',
         discount: 17,
         inStock: true
       },
@@ -66,7 +89,14 @@ const VendorCatalogue = () => {
         originalPrice: 20000,
         rating: 4.5,
         reviews: 67,
-        image: 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=400&h=400&fit=crop' },
+          { view: 'top', url: 'https://images.unsplash.com/photo-1625842268584-8f3296236761?w=400&h=400&fit=crop' },
+          { view: 'back', url: 'https://images.unsplash.com/photo-1563297007-0686b7003af7?w=400&h=400&fit=crop' },
+          { view: 'bottom', url: 'https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=400&h=400&fit=crop' }
+        ],
+        description: 'High-precision gaming mouse with customizable RGB lighting, 6 programmable buttons, and ergonomic design. Features up to 16,000 DPI for professional gaming performance.',
         discount: 25,
         inStock: false
       },
@@ -77,7 +107,14 @@ const VendorCatalogue = () => {
         originalPrice: 5000,
         rating: 4.4,
         reviews: 156,
-        image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop' },
+          { view: 'top', url: 'https://images.unsplash.com/photo-1572825708802-67b9c924d2a6?w=400&h=400&fit=crop' },
+          { view: 'back', url: 'https://images.unsplash.com/photo-1621768216002-5ac171876625?w=400&h=400&fit=crop' },
+          { view: 'bottom', url: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=400&fit=crop' }
+        ],
+        description: 'Premium 2-meter USB-C cable with fast charging and data transfer capabilities. Durable braided design withstands daily use and supports up to 100W power delivery.',
         discount: 30,
         inStock: true
       },
@@ -88,7 +125,14 @@ const VendorCatalogue = () => {
         originalPrice: 15000,
         rating: 4.3,
         reviews: 78,
-        image: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1609372332255-611485350f25?w=400&h=400&fit=crop' },
+          { view: 'top', url: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&h=400&fit=crop' },
+          { view: 'back', url: 'https://images.unsplash.com/photo-1554306297-0c86e837d24d?w=400&h=400&fit=crop' },
+          { view: 'bottom', url: 'https://images.unsplash.com/photo-1571019613914-85e35138ef2a?w=400&h=400&fit=crop' }
+        ],
+        description: 'Fast wireless charging pad compatible with all Qi-enabled devices. Features LED indicator, temperature control, and sleek design that complements any workspace.',
         discount: 20,
         inStock: true
       }
@@ -196,21 +240,60 @@ const VendorCatalogue = () => {
               {vendor.products.map((product) => (
                 <Card key={product.id} className="group border-border hover:shadow-soft transition-all duration-300 hover:-translate-y-1 overflow-hidden">
                   <div className="relative overflow-hidden">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                    <Carousel className="w-full">
+                      <CarouselContent>
+                        {product.images.map((image, index) => (
+                          <CarouselItem key={index}>
+                            <div className="relative">
+                              <img
+                                src={image.url}
+                                alt={`${product.name} - ${image.view} view`}
+                                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                              <div className="absolute bottom-2 left-2">
+                                <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm text-xs">
+                                  {image.view}
+                                </Badge>
+                              </div>
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="left-2" />
+                      <CarouselNext className="right-2" />
+                    </Carousel>
                     
                     {/* Overlay Actions */}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
-                      <Button size="icon" variant="secondary" className="h-10 w-10">
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <ProductDetails
+                        product={product}
+                        vendor={{ id: vendor.id, name: vendor.name, location: vendor.location }}
+                        trigger={
+                          <Button size="icon" variant="secondary" className="h-10 w-10">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        }
+                      />
                       <Button size="icon" variant="secondary" className="h-10 w-10">
                         <Heart className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="default" className="h-10 w-10">
+                      <Button 
+                        size="icon" 
+                        variant="default" 
+                        className="h-10 w-10"
+                        disabled={!product.inStock}
+                        onClick={() => product.inStock && addToCart({
+                          productId: product.id.toString(),
+                          vendorId: vendor.id || '',
+                          name: product.name,
+                          price: product.originalPrice,
+                          discountPrice: product.price !== product.originalPrice ? product.price : undefined,
+                          quantity: 1,
+                          image: product.images[0].url,
+                          vendor: { name: vendor.name, location: vendor.location },
+                          shipping: { cost: 1500, estimatedDays: 3 }
+                        })}
+                      >
                         <ShoppingCart className="h-4 w-4" />
                       </Button>
                     </div>
@@ -234,6 +317,10 @@ const VendorCatalogue = () => {
                     <h3 className="font-semibold text-lg text-foreground mb-2 line-clamp-2">
                       {product.name}
                     </h3>
+                    
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                      {product.description}
+                    </p>
                     
                     <div className="flex items-center gap-2 mb-3">
                       <div className="flex items-center">
@@ -269,7 +356,7 @@ const VendorCatalogue = () => {
                         price: product.originalPrice,
                         discountPrice: product.price !== product.originalPrice ? product.price : undefined,
                         quantity: 1,
-                        image: product.image,
+                        image: product.images[0].url,
                         vendor: { name: vendor.name, location: vendor.location },
                         shipping: { cost: 1500, estimatedDays: 3 }
                       })}

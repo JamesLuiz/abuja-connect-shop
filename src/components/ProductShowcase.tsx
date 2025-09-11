@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Star, ShoppingCart, Heart, Eye, Search, MapPin, Filter } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 
@@ -39,7 +40,11 @@ const ProductShowcase = () => {
         name: 'Premium Wireless Headphones',
         price: 45000,
         originalPrice: 60000,
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=400&h=400&fit=crop' },
+          { view: 'top', url: 'https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=400&h=400&fit=crop' }
+        ],
         discount: 25
       },
       description: 'Your premier destination for electronics and gadgets in Abuja'
@@ -58,7 +63,11 @@ const ProductShowcase = () => {
         name: 'Elegant African Print Dress',
         price: 15000,
         originalPrice: 20000,
-        image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=400&fit=crop' },
+          { view: 'back', url: 'https://images.unsplash.com/photo-1583743089695-4b816a340f82?w=400&h=400&fit=crop' }
+        ],
         discount: 25
       },
       description: 'Authentic African fashion and contemporary designs'
@@ -77,7 +86,11 @@ const ProductShowcase = () => {
         name: 'Smartphone with 128GB Storage',
         price: 180000,
         originalPrice: 220000,
-        image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1512499617640-c74ae3a79d37?w=400&h=400&fit=crop' },
+          { view: 'back', url: 'https://images.unsplash.com/photo-1567581935884-3349723552ca?w=400&h=400&fit=crop' }
+        ],
         discount: 18
       },
       description: 'Latest smartphones and mobile accessories'
@@ -96,7 +109,11 @@ const ProductShowcase = () => {
         name: 'Organic Face Cream Set',
         price: 8500,
         originalPrice: 12000,
-        image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=400&h=400&fit=crop' },
+          { view: 'top', url: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=400&h=400&fit=crop' }
+        ],
         discount: 29
       },
       description: 'Natural and organic beauty products for healthy skin'
@@ -115,7 +132,11 @@ const ProductShowcase = () => {
         name: 'Modern Table Lamp',
         price: 25000,
         originalPrice: 35000,
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+        images: [
+          { view: 'front', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop' },
+          { view: 'side', url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop' },
+          { view: 'top', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop' }
+        ],
         discount: 29
       },
       description: 'Transform your space with our curated home decor collection'
@@ -319,11 +340,28 @@ const ProductShowcase = () => {
               onClick={() => window.location.href = `/vendor/${vendor.id}`}
             >
               <div className="relative overflow-hidden">
-                <img
-                  src={vendor.bestSellingProduct.image}
-                  alt={vendor.bestSellingProduct.name}
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    {vendor.bestSellingProduct.images.map((image, index) => (
+                      <CarouselItem key={index}>
+                        <div className="relative">
+                          <img
+                            src={image.url}
+                            alt={`${vendor.bestSellingProduct.name} - ${image.view} view`}
+                            className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute bottom-2 left-2">
+                            <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm text-xs">
+                              {image.view}
+                            </Badge>
+                          </div>
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="left-2" />
+                  <CarouselNext className="right-2" />
+                </Carousel>
                 
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
