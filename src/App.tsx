@@ -31,6 +31,7 @@ import Login from "@/pages/Login";
 import AdminDashboard from "@/pages/AdminDashboard";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import AIAssistant from "@/components/AIAssistant";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -40,6 +41,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <AIAssistant />
           <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
