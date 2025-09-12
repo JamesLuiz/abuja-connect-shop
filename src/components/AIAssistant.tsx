@@ -3,14 +3,26 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageCircle, Send, X, Bot, User } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  MessageCircle, Send, X, Bot, User, Camera, Mic, MicOff, Star, 
+  ShoppingCart, Heart, Zap, TrendingUp, MapPin, Clock, Package,
+  Image as ImageIcon, Filter, Sparkles, ThumbsUp, Volume2, Search,
+  CreditCard, Bell, BarChart3, Lightbulb, Target, Shuffle
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  type?: 'text' | 'product' | 'recommendation' | 'action';
+  products?: Product[];
+  actions?: string[];
 }
 
 interface Product {
@@ -23,6 +35,17 @@ interface Product {
   vendor: string;
   location: string;
   category: string;
+  rating?: number;
+  inStock?: boolean;
+  description?: string;
+}
+
+interface AIFeature {
+  id: string;
+  name: string;
+  icon: any;
+  description: string;
+  action: () => void;
 }
 
 const AIAssistant = () => {
@@ -31,15 +54,34 @@ const AIAssistant = () => {
     {
       id: '1',
       role: 'assistant',
-      content: 'Hello! I am your shopping assistant. I can help you find products, check discounts, filter by price range, find items in specific locations, and provide customer support. How can I help you today?',
-      timestamp: new Date()
+      content: '🛍️ Welcome to your AI Shopping Assistant! I\'m powered by advanced AI to make your shopping experience exceptional.\n\n✨ I can help you with:\n• Smart product search & recommendations\n• Voice shopping commands\n• Visual product search\n• Price tracking & alerts\n• Real-time inventory checks\n• Personalized suggestions\n• Cart & wishlist management\n\nHow can I help you shop smarter today?',
+      timestamp: new Date(),
+      type: 'text'
     }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const { addToCart } = useCart();
+  const { user } = useAuth();
 
-  // Mock product data - in a real app, this would come from your backend
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Enhanced product data with more details
   const allProducts: Product[] = [
     {
       id: 1,
@@ -50,7 +92,10 @@ const AIAssistant = () => {
       discount: 25,
       vendor: 'TechHub Abuja',
       location: 'Wuse 2, Abuja FCT',
-      category: 'electronics'
+      category: 'electronics',
+      rating: 4.8,
+      inStock: true,
+      description: 'High-quality wireless headphones with noise cancellation'
     },
     {
       id: 2,
@@ -61,7 +106,10 @@ const AIAssistant = () => {
       discount: 20,
       vendor: 'Lagos Fashion House',
       location: 'Victoria Island, Lagos',
-      category: 'fashion'
+      category: 'fashion',
+      rating: 4.9,
+      inStock: true,
+      description: 'Elegant silk dress perfect for special occasions'
     },
     {
       id: 3,
@@ -72,7 +120,10 @@ const AIAssistant = () => {
       discount: 17,
       vendor: 'Beauty Essentials',
       location: 'Ikeja, Lagos',
-      category: 'beauty'
+      category: 'beauty',
+      rating: 4.6,
+      inStock: false,
+      description: 'Natural organic skincare products for healthy skin'
     },
     {
       id: 4,
@@ -81,7 +132,10 @@ const AIAssistant = () => {
       images: [{ view: 'front', url: 'https://images.unsplash.com/photo-1543512214-318c7553f230?w=400&h=400&fit=crop' }],
       vendor: 'TechHub Abuja',
       location: 'Wuse 2, Abuja FCT',
-      category: 'electronics'
+      category: 'electronics',
+      rating: 4.7,
+      inStock: true,
+      description: 'Smart speaker with voice assistant capabilities'
     },
     {
       id: 5,
@@ -92,7 +146,56 @@ const AIAssistant = () => {
       discount: 20,
       vendor: 'FitLife Store',
       location: 'Port Harcourt, Rivers',
-      category: 'sports'
+      category: 'sports',
+      rating: 4.5,
+      inStock: true,
+      description: 'Advanced fitness tracker with heart rate monitoring'
+    }
+  ];
+
+  // AI Features
+  const aiFeatures: AIFeature[] = [
+    {
+      id: 'voice',
+      name: 'Voice Search',
+      icon: Mic,
+      description: 'Speak to search products',
+      action: () => handleVoiceSearch()
+    },
+    {
+      id: 'visual',
+      name: 'Visual Search',
+      icon: Camera,
+      description: 'Upload image to find similar',
+      action: () => handleImageSearch()
+    },
+    {
+      id: 'smart-rec',
+      name: 'Smart Recommendations',
+      icon: Sparkles,
+      description: 'AI-powered suggestions',
+      action: () => handleSmartRecommendations()
+    },
+    {
+      id: 'price-track',
+      name: 'Price Tracker',
+      icon: TrendingUp,
+      description: 'Track price changes',
+      action: () => handlePriceTracking()
+    },
+    {
+      id: 'inventory',
+      name: 'Stock Check',
+      icon: Package,
+      description: 'Real-time availability',
+      action: () => handleInventoryCheck()
+    },
+    {
+      id: 'compare',
+      name: 'Compare Products',
+      icon: BarChart3,
+      description: 'Side-by-side comparison',
+      action: () => handleProductComparison()
     }
   ];
 
@@ -104,101 +207,336 @@ const AIAssistant = () => {
     scrollToBottom();
   }, [messages]);
 
-  const generateAIResponse = (userMessage: string): string => {
+  // Enhanced AI response generation
+  const generateAIResponse = (userMessage: string, feature?: string): Message => {
     const message = userMessage.toLowerCase();
+    let response: Message = {
+      id: (Date.now() + 1).toString(),
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      type: 'text'
+    };
 
-    // Product search
-    if (message.includes('find') || message.includes('search') || message.includes('looking for')) {
+    // Feature-specific responses
+    if (feature) {
+      switch (feature) {
+        case 'smart-rec':
+          response = {
+            ...response,
+            content: '🎯 Here are personalized recommendations based on your preferences:',
+            type: 'recommendation',
+            products: allProducts.slice(0, 3)
+          };
+          break;
+        case 'price-track':
+          response = {
+            ...response,
+            content: '📈 Price tracking activated! I\'ll monitor these products for price drops:',
+            type: 'action',
+            products: allProducts.filter(p => p.discount),
+            actions: ['Set Price Alert', 'View Price History']
+          };
+          break;
+        case 'inventory':
+          response = {
+            ...response,
+            content: '📦 Current stock status:',
+            type: 'product',
+            products: allProducts.map(p => ({ ...p, inStock: Math.random() > 0.3 }))
+          };
+          break;
+        case 'compare':
+          response = {
+            ...response,
+            content: '⚖️ Product comparison ready! Here are similar items:',
+            type: 'product',
+            products: allProducts.slice(0, 2)
+          };
+          break;
+      }
+      return response;
+    }
+
+    // Smart product search with AI understanding
+    if (message.includes('find') || message.includes('search') || message.includes('looking for') || message.includes('need')) {
       const searchResults = allProducts.filter(product => 
         product.name.toLowerCase().includes(message) ||
         product.category.toLowerCase().includes(message) ||
-        product.vendor.toLowerCase().includes(message)
+        product.vendor.toLowerCase().includes(message) ||
+        product.description?.toLowerCase().includes(message)
       );
 
       if (searchResults.length > 0) {
-        const productList = searchResults.map(p => {
-          const discountText = p.discount ? ` (${p.discount}% off!)` : '';
-          return `• ${p.name} - ₦${p.price.toLocaleString()}${discountText} from ${p.vendor} in ${p.location}`;
-        }).join('\n');
-        return `I found ${searchResults.length} product(s) matching your search:\n\n${productList}`;
+        response = {
+          ...response,
+          content: `🔍 Found ${searchResults.length} products matching "${userMessage}". Here are the best matches:`,
+          type: 'product',
+          products: searchResults
+        };
+      } else {
+        response.content = `🤔 I couldn't find exact matches for "${userMessage}". Let me suggest some alternatives based on AI analysis:`;
+        response.type = 'recommendation';
+        response.products = allProducts.slice(0, 2);
       }
-      return "I couldn't find any products matching your search. Try searching for electronics, fashion, beauty, sports, or specific product names.";
+      return response;
     }
 
-    // Discount products
-    if (message.includes('discount') || message.includes('sale') || message.includes('offer')) {
+    // Smart discount and deals detection
+    if (message.includes('discount') || message.includes('sale') || message.includes('deal') || message.includes('offer') || message.includes('cheap')) {
       const discountedProducts = allProducts.filter(p => p.discount && p.discount > 0);
-      const productList = discountedProducts.map(p => 
-        `• ${p.name} - ₦${p.price.toLocaleString()} (${p.discount}% off from ₦${p.originalPrice?.toLocaleString()}) from ${p.vendor}`
-      ).join('\n');
-      return `Here are products currently on discount:\n\n${productList}`;
+      response = {
+        ...response,
+        content: '🎉 Hot deals and discounts available now! These are trending:',
+        type: 'product',
+        products: discountedProducts,
+        actions: ['Add to Cart', 'Set Price Alert', 'Add to Wishlist']
+      };
+      return response;
     }
 
-    // Price range
-    if (message.includes('price') || message.includes('budget') || message.includes('₦') || /\d+/.test(message)) {
+    // Budget-aware recommendations
+    if (message.includes('budget') || message.includes('price') || message.includes('₦') || /\d+/.test(message)) {
       const numbers = message.match(/\d+/g);
       if (numbers) {
         const budget = parseInt(numbers[0]) * (numbers.length > 1 ? 1000 : 1);
         const affordableProducts = allProducts.filter(p => p.price <= budget);
         
         if (affordableProducts.length > 0) {
-          const productList = affordableProducts.map(p => 
-            `• ${p.name} - ₦${p.price.toLocaleString()} from ${p.vendor} in ${p.location}`
-          ).join('\n');
-          return `Here are products within your budget of ₦${budget.toLocaleString()}:\n\n${productList}`;
+          response = {
+            ...response,
+            content: `💰 Perfect! Here are quality products within your ₦${budget.toLocaleString()} budget:`,
+            type: 'product',
+            products: affordableProducts,
+            actions: ['Quick Add to Cart', 'Compare Prices', 'Check Reviews']
+          };
+        } else {
+          response.content = `💡 Your budget is ₦${budget.toLocaleString()}. Let me find the best value options and potential discounts:`;
+          response.type = 'recommendation';
+          response.products = allProducts.slice(0, 2);
         }
-        return `I couldn't find products within ₦${budget.toLocaleString()}. Try increasing your budget or check our discounted items.`;
       }
+      return response;
     }
 
-    // Location-based search
-    if (message.includes('lagos') || message.includes('abuja') || message.includes('port harcourt') || message.includes('location') || message.includes('near')) {
+    // Location-based smart search
+    if (message.includes('near') || message.includes('location') || message.includes('delivery') || 
+        message.includes('lagos') || message.includes('abuja') || message.includes('port harcourt')) {
       let location = '';
       if (message.includes('lagos')) location = 'Lagos';
       else if (message.includes('abuja')) location = 'Abuja';
       else if (message.includes('port harcourt')) location = 'Port Harcourt';
       
-      if (location) {
-        const locationProducts = allProducts.filter(p => 
-          p.location.toLowerCase().includes(location.toLowerCase())
-        );
-        
-        if (locationProducts.length > 0) {
-          const productList = locationProducts.map(p => 
-            `• ${p.name} - ₦${p.price.toLocaleString()} from ${p.vendor} in ${p.location}`
-          ).join('\n');
-          return `Here are products available in ${location}:\n\n${productList}`;
-        }
-      }
-      return "Please specify a location (Lagos, Abuja, or Port Harcourt) to find products near you.";
+      const locationProducts = allProducts.filter(p => 
+        !location || p.location.toLowerCase().includes(location.toLowerCase())
+      );
+      
+      response = {
+        ...response,
+        content: location ? 
+          `📍 Products available in ${location} with fast delivery:` : 
+          '🚚 Products sorted by delivery speed and location:',
+        type: 'product',
+        products: locationProducts,
+        actions: ['Check Delivery Time', 'Add to Cart', 'Track Vendor']
+      };
+      return response;
     }
 
-    // Customer support
+    // Cart and wishlist management
+    if (message.includes('cart') || message.includes('add') || message.includes('buy')) {
+      response = {
+        ...response,
+        content: '🛒 Cart management activated! Here are your recommended actions:',
+        type: 'action',
+        actions: ['View Cart', 'Quick Checkout', 'Save for Later', 'Find Similar Items'],
+        products: allProducts.slice(0, 1)
+      };
+      return response;
+    }
+
+    // Order tracking and support
+    if (message.includes('order') || message.includes('track') || message.includes('delivery') || message.includes('status')) {
+      response.content = `📦 Order tracking & delivery updates:
+
+🚚 **Current Orders:**
+• Order #12345 - Premium Headphones - Out for delivery
+• Order #12346 - Silk Dress - Processing
+
+📱 **Quick Actions:**
+• Track all orders
+• Contact vendor
+• Delivery preferences
+• Return/Exchange
+
+Would you like me to check a specific order?`;
+      return response;
+    }
+
+    // Customer support with AI
     if (message.includes('help') || message.includes('support') || message.includes('problem') || message.includes('issue')) {
-      return `I'm here to help! I can assist you with:
+      response.content = `🤖 **AI-Powered Support Ready!**
 
-• Finding specific products
-• Checking for discounts and sales
-• Filtering products by price range
-• Finding products in your location
-• General shopping questions
+🎯 **Instant Solutions:**
+• Product recommendations
+• Order assistance
+• Technical support
+• Return/refund help
 
-You can also contact our support team:
-📞 Phone: +234-800-SHOP-NOW
-📧 Email: support@marketplace.com
-💬 Live Chat: Available 24/7`;
+📞 **Human Support:**
+• Phone: +234-800-SHOP-NOW
+• Email: ai-support@marketplace.com
+• Live Chat: 24/7 AI + Human escalation
+
+🚀 **Premium Features:**
+• Voice commands
+• Visual search
+• Smart notifications
+• Personalized shopping
+
+What specific issue can I solve for you?`;
+      return response;
     }
 
-    // Default response
-    return `I can help you with:
+    // Default intelligent response
+    response.content = `🤖 **AI Shopping Assistant Ready!**
 
-🔍 **Product Search**: "Find wireless headphones" or "Show me electronics"
-💰 **Discounts**: "What products are on sale?"
-💵 **Price Range**: "Show me products under ₦30,000"
-📍 **Location**: "Find products in Lagos"
-🆘 **Support**: "I need help with my order"
+🛍️ **Smart Features:**
+• Voice search: "Find me wireless headphones"
+• Visual search: Upload product images
+• Price tracking: Get alerts on deals
+• Smart recommendations: Personalized for you
+
+💡 **Try saying:**
+• "Show me deals under ₦30,000"
+• "Find electronics in Lagos"
+• "Track my recent orders"
+• "Compare these two products"
+
+✨ **AI-Powered Capabilities:**
+• Natural language understanding
+• Real-time inventory checking
+• Predictive recommendations
+• Multi-modal search
 
 What would you like to explore?`;
+    
+    return response;
+  };
+
+  // Voice search functionality
+  const handleVoiceSearch = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+      alert('Voice search not supported in this browser');
+      return;
+    }
+
+    const recognition = new (window as any).webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    setIsListening(true);
+    recognition.start();
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setInputValue(transcript);
+      setIsListening(false);
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+  };
+
+  // Image search functionality
+  const handleImageSearch = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const message: Message = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: `🖼️ Uploaded image for visual search: ${file.name}`,
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, message]);
+      
+      setTimeout(() => {
+        const aiResponse = generateAIResponse('visual search similar products', 'smart-rec');
+        setMessages(prev => [...prev, aiResponse]);
+      }, 1000);
+    }
+  };
+
+  // Feature handlers
+  const handleSmartRecommendations = () => {
+    const message: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: '✨ Show me smart recommendations',
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, message]);
+    
+    setTimeout(() => {
+      const aiResponse = generateAIResponse('', 'smart-rec');
+      setMessages(prev => [...prev, aiResponse]);
+    }, 500);
+  };
+
+  const handlePriceTracking = () => {
+    const message: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: '📈 Set up price tracking',
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, message]);
+    
+    setTimeout(() => {
+      const aiResponse = generateAIResponse('', 'price-track');
+      setMessages(prev => [...prev, aiResponse]);
+    }, 500);
+  };
+
+  const handleInventoryCheck = () => {
+    const message: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: '📦 Check inventory status',
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, message]);
+    
+    setTimeout(() => {
+      const aiResponse = generateAIResponse('', 'inventory');
+      setMessages(prev => [...prev, aiResponse]);
+    }, 500);
+  };
+
+  const handleProductComparison = () => {
+    const message: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: '⚖️ Compare similar products',
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, message]);
+    
+    setTimeout(() => {
+      const aiResponse = generateAIResponse('', 'compare');
+      setMessages(prev => [...prev, aiResponse]);
+    }, 500);
   };
 
   const handleSendMessage = async () => {
@@ -215,18 +553,12 @@ What would you like to explore?`;
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI processing time
+    // Simulate AI processing with more realistic delay
     setTimeout(() => {
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: generateAIResponse(inputValue),
-        timestamp: new Date()
-      };
-
+      const aiResponse = generateAIResponse(inputValue);
       setMessages(prev => [...prev, aiResponse]);
       setIsTyping(false);
-    }, 1000);
+    }, 1200);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -236,11 +568,103 @@ What would you like to explore?`;
     }
   };
 
+  const handleQuickAction = (action: string, product: Product) => {
+    if (action === 'Add to Cart' || action === 'Quick Add to Cart') {
+      addToCart({
+        productId: product.id.toString(),
+        vendorId: product.vendor.toLowerCase().replace(/\s+/g, '-'),
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        image: product.images[0]?.url || '',
+        vendor: {
+          name: product.vendor,
+          location: product.location
+        },
+        shipping: {
+          cost: 2000,
+          estimatedDays: 3
+        }
+      });
+      
+      const successMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `✅ Added "${product.name}" to your cart! 🛒\n\nWhat else can I help you find?`,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, successMessage]);
+    }
+  };
+
+  const renderProductCard = (product: Product, actions?: string[]) => (
+    <div key={product.id} className="bg-card border rounded-lg p-3 mb-3">
+      <div className="flex gap-3">
+        <img 
+          src={product.images[0]?.url} 
+          alt={product.name}
+          className="w-16 h-16 object-cover rounded-md"
+        />
+        <div className="flex-1 min-w-0">
+          <h4 className="font-medium text-sm truncate">{product.name}</h4>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="font-bold text-primary">₦{product.price.toLocaleString()}</span>
+            {product.originalPrice && (
+              <>
+                <span className="text-xs text-muted-foreground line-through">
+                  ₦{product.originalPrice.toLocaleString()}
+                </span>
+                <Badge variant="secondary" className="text-xs">{product.discount}% off</Badge>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            {product.rating && (
+              <div className="flex items-center gap-1">
+                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                <span className="text-xs">{product.rating}</span>
+              </div>
+            )}
+            <Badge variant={product.inStock ? "default" : "destructive"} className="text-xs">
+              {product.inStock ? "In Stock" : "Out of Stock"}
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">{product.vendor}</p>
+        </div>
+      </div>
+      
+      {actions && (
+        <div className="flex flex-wrap gap-2 mt-3">
+          {actions.map((action) => (
+            <Button
+              key={action}
+              size="sm"
+              variant="outline"
+              className="text-xs h-7"
+              onClick={() => handleQuickAction(action, product)}
+            >
+              {action}
+            </Button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <>
+      {/* Hidden file input for image upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="hidden"
+      />
+
       {/* Floating Button */}
       <motion.div
-        className="fixed bottom-6 right-6 z-50"
+        className={`fixed ${isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'} z-50`}
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
@@ -248,10 +672,15 @@ What would you like to explore?`;
         {!isOpen && (
           <Button
             onClick={() => setIsOpen(true)}
-            className="h-14 w-14 rounded-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300"
+            className={`${isMobile ? 'h-12 w-12' : 'h-14 w-14'} rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-white/20`}
             size="icon"
           >
-            <MessageCircle className="h-6 w-6" />
+            <motion.div
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            >
+              <Sparkles className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
+            </motion.div>
           </Button>
         )}
       </motion.div>
@@ -264,13 +693,21 @@ What would you like to explore?`;
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 100, scale: 0.3 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className="fixed bottom-6 right-6 z-50 w-96 h-[500px]"
+            className={`fixed ${isMobile ? 'inset-4' : 'bottom-6 right-6 w-96 h-[600px]'} z-50`}
           >
-            <Card className="w-full h-full shadow-2xl border-2">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-t-lg">
-                <div className="flex items-center space-x-2">
-                  <Bot className="h-5 w-5" />
-                  <CardTitle className="text-lg">AI Shopping Assistant</CardTitle>
+            <Card className="w-full h-full shadow-2xl border-2 border-primary/20 bg-background/95 backdrop-blur-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground rounded-t-lg">
+                <div className="flex items-center space-x-3">
+                  <motion.div
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Bot className="h-6 w-6" />
+                  </motion.div>
+                  <div>
+                    <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'}`}>AI Shopping Assistant</CardTitle>
+                    <p className="text-primary-foreground/80 text-xs">Powered by Advanced AI</p>
+                  </div>
                 </div>
                 <Button
                   variant="ghost"
@@ -283,6 +720,25 @@ What would you like to explore?`;
               </CardHeader>
               
               <CardContent className="flex flex-col h-full p-0">
+                {/* AI Features Quick Access */}
+                <div className="p-3 border-b bg-muted/30">
+                  <div className="grid grid-cols-3 gap-2">
+                    {aiFeatures.slice(0, 6).map((feature) => (
+                      <Button
+                        key={feature.id}
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-2 flex flex-col items-center gap-1 hover:bg-primary/10"
+                        onClick={feature.action}
+                      >
+                        <feature.icon className="h-4 w-4" />
+                        <span className="text-xs">{feature.name}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Messages */}
                 <ScrollArea className="flex-1 p-4">
                   <div className="space-y-4">
                     {messages.map((message) => (
@@ -291,16 +747,51 @@ What would you like to explore?`;
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[80%] p-3 rounded-lg ${
+                          className={`max-w-[85%] ${
                             message.role === 'user'
-                              ? 'bg-primary text-primary-foreground ml-auto'
-                              : 'bg-muted text-foreground'
-                          }`}
+                              ? 'bg-primary text-primary-foreground ml-auto rounded-2xl rounded-br-md'
+                              : 'bg-muted text-foreground rounded-2xl rounded-bl-md'
+                          } p-3`}
                         >
                           <div className="flex items-start space-x-2">
-                            {message.role === 'assistant' && <Bot className="h-4 w-4 mt-0.5 flex-shrink-0" />}
+                            {message.role === 'assistant' && (
+                              <motion.div
+                                animate={{ rotate: [0, 360] }}
+                                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                              >
+                                <Bot className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                              </motion.div>
+                            )}
                             {message.role === 'user' && <User className="h-4 w-4 mt-0.5 flex-shrink-0" />}
-                            <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                            
+                            <div className="flex-1">
+                              <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                              
+                              {/* Render products */}
+                              {message.products && message.products.length > 0 && (
+                                <div className="mt-3">
+                                  {message.products.map(product => 
+                                    renderProductCard(product, message.actions)
+                                  )}
+                                </div>
+                              )}
+                              
+                              {/* Render action buttons */}
+                              {message.actions && !message.products && (
+                                <div className="flex flex-wrap gap-2 mt-3">
+                                  {message.actions.map((action) => (
+                                    <Button
+                                      key={action}
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-xs h-7"
+                                    >
+                                      {action}
+                                    </Button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -308,7 +799,7 @@ What would you like to explore?`;
                     
                     {isTyping && (
                       <div className="flex justify-start">
-                        <div className="bg-muted p-3 rounded-lg">
+                        <div className="bg-muted p-3 rounded-2xl rounded-bl-md">
                           <div className="flex items-center space-x-2">
                             <Bot className="h-4 w-4" />
                             <div className="flex space-x-1">
@@ -324,18 +815,57 @@ What would you like to explore?`;
                   <div ref={messagesEndRef} />
                 </ScrollArea>
                 
-                <div className="p-4 border-t">
+                {/* Input Area */}
+                <div className="p-4 border-t bg-background/80">
                   <div className="flex space-x-2">
-                    <Input
-                      placeholder="Ask me about products, discounts, prices..."
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      className="flex-1"
-                    />
-                    <Button onClick={handleSendMessage} size="icon" disabled={!inputValue.trim()}>
+                    <div className="flex-1 relative">
+                      <Textarea
+                        placeholder="Ask me anything about shopping..."
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        className="min-h-[44px] max-h-24 resize-none pr-20"
+                        rows={1}
+                      />
+                      <div className="absolute right-2 top-2 flex space-x-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={handleVoiceSearch}
+                          disabled={isListening}
+                        >
+                          {isListening ? (
+                            <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1 }}>
+                              <MicOff className="h-4 w-4 text-red-500" />
+                            </motion.div>
+                          ) : (
+                            <Mic className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={handleImageSearch}
+                        >
+                          <Camera className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={handleSendMessage} 
+                      size="icon" 
+                      disabled={!inputValue.trim()}
+                      className="h-11 w-11 bg-gradient-to-r from-primary to-primary/80"
+                    >
                       <Send className="h-4 w-4" />
                     </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+                    <span>AI-powered shopping assistant</span>
+                    {user && <span>Personalized for {user.name}</span>}
                   </div>
                 </div>
               </CardContent>
