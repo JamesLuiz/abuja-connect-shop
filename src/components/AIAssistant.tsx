@@ -576,19 +576,23 @@ What would you like to explore?`;
     // Create a route-friendly vendor ID
     const vendorId = product.vendor.toLowerCase().replace(/\s+/g, '-');
     navigate(`/vendor/${vendorId}`);
+    setIsOpen(false); // Auto-close AI window
   };
 
   const navigateToCategory = (category: string) => {
     navigate(`/category/${category}`);
+    setIsOpen(false); // Auto-close AI window
   };
 
   const navigateToVendor = (vendorName: string) => {
     const vendorId = vendorName.toLowerCase().replace(/\s+/g, '-');
     navigate(`/vendor/${vendorId}`);
+    setIsOpen(false); // Auto-close AI window
   };
 
   const navigateToSearch = (query: string) => {
     navigate(`/vendors?search=${encodeURIComponent(query)}`);
+    setIsOpen(false); // Auto-close AI window
   };
 
   const handleQuickAction = (action: string, product: Product) => {
@@ -742,47 +746,47 @@ What would you like to explore?`;
             className={`fixed z-50 ${
               isMobile 
                 ? 'inset-0 m-2' 
-                : 'bottom-6 right-6 w-96 h-[600px]'
+                : 'bottom-6 right-6 w-80 h-[500px]'
             }`}
           >
             <Card className="w-full h-full shadow-2xl border-2 border-primary/20 bg-background/95 backdrop-blur-lg flex flex-col">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground rounded-t-lg flex-shrink-0">
-                <div className="flex items-center space-x-3">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground rounded-t-lg flex-shrink-0">
+                <div className="flex items-center space-x-2">
                   <motion.div
                     animate={{ rotate: [0, 360] }}
                     transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                   >
-                    <Bot className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
+                    <Bot className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
                   </motion.div>
                   <div>
-                    <CardTitle className={`${isMobile ? 'text-sm' : 'text-lg'}`}>AI Shopping Assistant</CardTitle>
-                    <p className={`text-primary-foreground/80 ${isMobile ? 'text-xs' : 'text-xs'}`}>Powered by Advanced AI</p>
+                    <CardTitle className={`${isMobile ? 'text-sm' : 'text-base'}`}>AI Shopping Assistant</CardTitle>
+                    <p className={`text-primary-foreground/80 ${isMobile ? 'text-xs' : 'text-xs'}`}>Powered by AI</p>
                   </div>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsOpen(false)}
-                  className="h-8 w-8 text-primary-foreground hover:bg-white/20"
+                  className="h-7 w-7 text-primary-foreground hover:bg-white/20"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                 </Button>
               </CardHeader>
               
               <CardContent className="flex flex-col flex-1 p-0 min-h-0">
                 {/* AI Features Quick Access */}
-                <div className={`${isMobile ? 'p-2' : 'p-3'} border-b bg-muted/30 flex-shrink-0`}>
-                  <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3'} gap-2`}>
+                <div className={`${isMobile ? 'p-1.5' : 'p-2'} border-b bg-muted/30 flex-shrink-0`}>
+                  <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3'} gap-1.5`}>
                     {aiFeatures.slice(0, 6).map((feature) => (
                       <Button
                         key={feature.id}
                         variant="ghost"
                         size="sm"
-                        className={`h-auto ${isMobile ? 'p-1.5' : 'p-2'} flex flex-col items-center gap-1 hover:bg-primary/10 text-center`}
+                        className={`h-auto ${isMobile ? 'p-1' : 'p-1.5'} flex flex-col items-center gap-0.5 hover:bg-primary/10 text-center`}
                         onClick={feature.action}
                       >
-                        <feature.icon className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
-                        <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} leading-tight`}>{feature.name}</span>
+                        <feature.icon className={`${isMobile ? 'h-3 w-3' : 'h-3.5 w-3.5'}`} />
+                        <span className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} leading-tight`}>{feature.name}</span>
                       </Button>
                     ))}
                   </div>
@@ -864,42 +868,41 @@ What would you like to explore?`;
                   </div>
                   <div ref={messagesEndRef} />
                 </ScrollArea>
-                
                 {/* Input Area */}
-                <div className={`${isMobile ? 'p-3' : 'p-4'} border-t bg-background/80 flex-shrink-0`}>
+                <div className={`${isMobile ? 'p-2' : 'p-3'} border-t bg-background/80 flex-shrink-0`}>
                   <div className="flex space-x-2">
                     <div className="flex-1 relative">
                       <Textarea
-                        placeholder={isMobile ? "Ask me anything..." : "Ask me anything about shopping..."}
+                        placeholder={isMobile ? "Ask me..." : "Ask me anything..."}
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        className={`${isMobile ? 'min-h-[36px] pr-16 text-sm' : 'min-h-[44px] pr-20'} max-h-24 resize-none`}
+                        className={`${isMobile ? 'min-h-[32px] pr-14 text-xs' : 'min-h-[36px] pr-16 text-sm'} max-h-20 resize-none`}
                         rows={1}
                       />
-                      <div className={`absolute ${isMobile ? 'right-1.5 top-1.5' : 'right-2 top-2'} flex space-x-1`}>
+                      <div className={`absolute ${isMobile ? 'right-1 top-1' : 'right-1.5 top-1.5'} flex space-x-0.5`}>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className={`${isMobile ? 'h-6 w-6' : 'h-8 w-8'}`}
+                          className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`}
                           onClick={handleVoiceSearch}
                           disabled={isListening}
                         >
                           {isListening ? (
                             <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1 }}>
-                              <MicOff className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-red-500`} />
+                              <MicOff className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'} text-red-500`} />
                             </motion.div>
                           ) : (
-                            <Mic className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                            <Mic className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'}`} />
                           )}
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className={`${isMobile ? 'h-6 w-6' : 'h-8 w-8'}`}
+                          className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`}
                           onClick={handleImageSearch}
                         >
-                          <Camera className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                          <Camera className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'}`} />
                         </Button>
                       </div>
                     </div>
@@ -907,15 +910,14 @@ What would you like to explore?`;
                       onClick={handleSendMessage} 
                       size="icon" 
                       disabled={!inputValue.trim()}
-                      className={`${isMobile ? 'h-9 w-9' : 'h-11 w-11'} bg-gradient-to-r from-primary to-primary/80 flex-shrink-0`}
+                      className={`${isMobile ? 'h-8 w-8' : 'h-9 w-9'} bg-gradient-to-r from-primary to-primary/80 flex-shrink-0`}
                     >
-                      <Send className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
+                      <Send className={`${isMobile ? 'h-3 w-3' : 'h-3.5 w-3.5'}`} />
                     </Button>
                   </div>
                   
-                  <div className={`flex items-center justify-between mt-2 ${isMobile ? 'text-xs' : 'text-xs'} text-muted-foreground`}>
-                    <span>AI-powered shopping assistant</span>
-                    {user && <span className={isMobile ? 'truncate max-w-24' : ''}>Personalized for {user.name}</span>}
+                  <div className={`flex items-center justify-center mt-1.5 ${isMobile ? 'text-[10px]' : 'text-xs'} text-muted-foreground`}>
+                    <span>AI-powered assistant</span>
                   </div>
                 </div>
               </CardContent>
