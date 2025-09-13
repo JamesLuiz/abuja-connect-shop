@@ -41,8 +41,8 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <AIAssistant />
           <BrowserRouter>
+          <AIAssistant />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/vendor/register" element={<VendorRegister />} /> 
