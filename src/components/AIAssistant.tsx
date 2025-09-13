@@ -9,11 +9,12 @@ import {
   MessageCircle, Send, X, Bot, User, Camera, Mic, MicOff, Star, 
   ShoppingCart, Heart, Zap, TrendingUp, MapPin, Clock, Package,
   Image as ImageIcon, Filter, Sparkles, ThumbsUp, Volume2, Search,
-  CreditCard, Bell, BarChart3, Lightbulb, Target, Shuffle
+  CreditCard, Bell, BarChart3, Lightbulb, Target, Shuffle, ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -69,11 +70,12 @@ const AIAssistant = () => {
   
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Check if mobile
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 1024);
     };
     
     checkMobile();
@@ -290,7 +292,7 @@ const AIAssistant = () => {
         content: '🎉 Hot deals and discounts available now! These are trending:',
         type: 'product',
         products: discountedProducts,
-        actions: ['Add to Cart', 'Set Price Alert', 'Add to Wishlist']
+        actions: ['Add to Cart', 'View Product', 'View Vendor', 'Set Price Alert']
       };
       return response;
     }
@@ -308,12 +310,13 @@ const AIAssistant = () => {
             content: `💰 Perfect! Here are quality products within your ₦${budget.toLocaleString()} budget:`,
             type: 'product',
             products: affordableProducts,
-            actions: ['Quick Add to Cart', 'Compare Prices', 'Check Reviews']
+            actions: ['Quick Add to Cart', 'View Product', 'Compare Prices', 'Browse Category']
           };
         } else {
           response.content = `💡 Your budget is ₦${budget.toLocaleString()}. Let me find the best value options and potential discounts:`;
           response.type = 'recommendation';
           response.products = allProducts.slice(0, 2);
+          response.actions = ['View Product', 'Set Price Alert', 'Browse Similar'];
         }
       }
       return response;
@@ -338,7 +341,7 @@ const AIAssistant = () => {
           '🚚 Products sorted by delivery speed and location:',
         type: 'product',
         products: locationProducts,
-        actions: ['Check Delivery Time', 'Add to Cart', 'Track Vendor']
+        actions: ['Check Delivery Time', 'Add to Cart', 'View Vendor', 'Browse Category']
       };
       return response;
     }
@@ -568,6 +571,26 @@ What would you like to explore?`;
     }
   };
 
+  // Navigation helper functions
+  const navigateToProduct = (product: Product) => {
+    // Create a route-friendly vendor ID
+    const vendorId = product.vendor.toLowerCase().replace(/\s+/g, '-');
+    navigate(`/vendor/${vendorId}`);
+  };
+
+  const navigateToCategory = (category: string) => {
+    navigate(`/category/${category}`);
+  };
+
+  const navigateToVendor = (vendorName: string) => {
+    const vendorId = vendorName.toLowerCase().replace(/\s+/g, '-');
+    navigate(`/vendor/${vendorId}`);
+  };
+
+  const navigateToSearch = (query: string) => {
+    navigate(`/vendors?search=${encodeURIComponent(query)}`);
+  };
+
   const handleQuickAction = (action: string, product: Product) => {
     if (action === 'Add to Cart' || action === 'Quick Add to Cart') {
       addToCart({
@@ -594,19 +617,37 @@ What would you like to explore?`;
         timestamp: new Date()
       };
       setMessages(prev => [...prev, successMessage]);
+    } else if (action === 'View Product' || action === 'View Details') {
+      navigateToProduct(product);
+    } else if (action === 'View Vendor' || action === 'Track Vendor') {
+      navigateToVendor(product.vendor);
+    } else if (action === 'Browse Category') {
+      navigateToCategory(product.category);
     }
   };
 
   const renderProductCard = (product: Product, actions?: string[]) => (
-    <div key={product.id} className="bg-card border rounded-lg p-3 mb-3">
+    <div key={product.id} className="bg-card border rounded-lg p-3 mb-3 hover:shadow-md transition-shadow">
       <div className="flex gap-3">
-        <img 
-          src={product.images[0]?.url} 
-          alt={product.name}
-          className="w-16 h-16 object-cover rounded-md"
-        />
+        <button
+          onClick={() => navigateToProduct(product)}
+          className="flex-shrink-0 group"
+        >
+          <img 
+            src={product.images[0]?.url} 
+            alt={product.name}
+            className="w-16 h-16 object-cover rounded-md group-hover:scale-105 transition-transform"
+          />
+        </button>
         <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-sm truncate">{product.name}</h4>
+          <button
+            onClick={() => navigateToProduct(product)}
+            className="text-left w-full group"
+          >
+            <h4 className="font-medium text-sm truncate group-hover:text-primary transition-colors">
+              {product.name}
+            </h4>
+          </button>
           <div className="flex items-center gap-2 mt-1">
             <span className="font-bold text-primary">₦{product.price.toLocaleString()}</span>
             {product.originalPrice && (
@@ -629,7 +670,12 @@ What would you like to explore?`;
               {product.inStock ? "In Stock" : "Out of Stock"}
             </Badge>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">{product.vendor}</p>
+          <button
+            onClick={() => navigateToVendor(product.vendor)}
+            className="text-xs text-muted-foreground mt-1 hover:text-primary transition-colors"
+          >
+            {product.vendor} <ExternalLink className="h-3 w-3 inline ml-1" />
+          </button>
         </div>
       </div>
       
@@ -640,7 +686,7 @@ What would you like to explore?`;
               key={action}
               size="sm"
               variant="outline"
-              className="text-xs h-7"
+              className="text-xs h-7 hover:bg-primary hover:text-primary-foreground"
               onClick={() => handleQuickAction(action, product)}
             >
               {action}
@@ -672,14 +718,14 @@ What would you like to explore?`;
         {!isOpen && (
           <Button
             onClick={() => setIsOpen(true)}
-            className={`${isMobile ? 'h-12 w-12' : 'h-14 w-14'} rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-white/20`}
+            className={`${isMobile ? 'h-14 w-14' : 'h-16 w-16'} rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-white/20`}
             size="icon"
           >
             <motion.div
               animate={{ rotate: [0, 360] }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
             >
-              <Sparkles className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
+              <Sparkles className={`${isMobile ? 'h-6 w-6' : 'h-7 w-7'} text-white`} />
             </motion.div>
           </Button>
         )}
@@ -693,20 +739,24 @@ What would you like to explore?`;
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 100, scale: 0.3 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className={`fixed ${isMobile ? 'inset-4' : 'bottom-6 right-6 w-96 h-[600px]'} z-50`}
+            className={`fixed z-50 ${
+              isMobile 
+                ? 'inset-0 m-2' 
+                : 'bottom-6 right-6 w-96 h-[600px]'
+            }`}
           >
-            <Card className="w-full h-full shadow-2xl border-2 border-primary/20 bg-background/95 backdrop-blur-lg">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground rounded-t-lg">
+            <Card className="w-full h-full shadow-2xl border-2 border-primary/20 bg-background/95 backdrop-blur-lg flex flex-col">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground rounded-t-lg flex-shrink-0">
                 <div className="flex items-center space-x-3">
                   <motion.div
                     animate={{ rotate: [0, 360] }}
                     transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                   >
-                    <Bot className="h-6 w-6" />
+                    <Bot className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
                   </motion.div>
                   <div>
-                    <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'}`}>AI Shopping Assistant</CardTitle>
-                    <p className="text-primary-foreground/80 text-xs">Powered by Advanced AI</p>
+                    <CardTitle className={`${isMobile ? 'text-sm' : 'text-lg'}`}>AI Shopping Assistant</CardTitle>
+                    <p className={`text-primary-foreground/80 ${isMobile ? 'text-xs' : 'text-xs'}`}>Powered by Advanced AI</p>
                   </div>
                 </div>
                 <Button
@@ -719,39 +769,39 @@ What would you like to explore?`;
                 </Button>
               </CardHeader>
               
-              <CardContent className="flex flex-col h-full p-0">
+              <CardContent className="flex flex-col flex-1 p-0 min-h-0">
                 {/* AI Features Quick Access */}
-                <div className="p-3 border-b bg-muted/30">
-                  <div className="grid grid-cols-3 gap-2">
+                <div className={`${isMobile ? 'p-2' : 'p-3'} border-b bg-muted/30 flex-shrink-0`}>
+                  <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3'} gap-2`}>
                     {aiFeatures.slice(0, 6).map((feature) => (
                       <Button
                         key={feature.id}
                         variant="ghost"
                         size="sm"
-                        className="h-auto p-2 flex flex-col items-center gap-1 hover:bg-primary/10"
+                        className={`h-auto ${isMobile ? 'p-1.5' : 'p-2'} flex flex-col items-center gap-1 hover:bg-primary/10 text-center`}
                         onClick={feature.action}
                       >
-                        <feature.icon className="h-4 w-4" />
-                        <span className="text-xs">{feature.name}</span>
+                        <feature.icon className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
+                        <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} leading-tight`}>{feature.name}</span>
                       </Button>
                     ))}
                   </div>
                 </div>
 
                 {/* Messages */}
-                <ScrollArea className="flex-1 p-4">
-                  <div className="space-y-4">
+                <ScrollArea className={`flex-1 ${isMobile ? 'p-2' : 'p-4'} min-h-0`}>
+                  <div className={`space-y-${isMobile ? '3' : '4'}`}>
                     {messages.map((message) => (
                       <div
                         key={message.id}
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[85%] ${
+                          className={`${isMobile ? 'max-w-[90%]' : 'max-w-[85%]'} ${
                             message.role === 'user'
                               ? 'bg-primary text-primary-foreground ml-auto rounded-2xl rounded-br-md'
                               : 'bg-muted text-foreground rounded-2xl rounded-bl-md'
-                          } p-3`}
+                          } ${isMobile ? 'p-2.5' : 'p-3'}`}
                         >
                           <div className="flex items-start space-x-2">
                             {message.role === 'assistant' && (
@@ -759,17 +809,17 @@ What would you like to explore?`;
                                 animate={{ rotate: [0, 360] }}
                                 transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                               >
-                                <Bot className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                                <Bot className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'} mt-0.5 flex-shrink-0`} />
                               </motion.div>
                             )}
-                            {message.role === 'user' && <User className="h-4 w-4 mt-0.5 flex-shrink-0" />}
+                            {message.role === 'user' && <User className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'} mt-0.5 flex-shrink-0`} />}
                             
-                            <div className="flex-1">
-                              <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                            <div className="flex-1 min-w-0">
+                              <div className={`whitespace-pre-wrap ${isMobile ? 'text-xs' : 'text-sm'} leading-relaxed`}>{message.content}</div>
                               
                               {/* Render products */}
                               {message.products && message.products.length > 0 && (
-                                <div className="mt-3">
+                                <div className={`${isMobile ? 'mt-2' : 'mt-3'} space-y-2`}>
                                   {message.products.map(product => 
                                     renderProductCard(product, message.actions)
                                   )}
@@ -778,13 +828,13 @@ What would you like to explore?`;
                               
                               {/* Render action buttons */}
                               {message.actions && !message.products && (
-                                <div className="flex flex-wrap gap-2 mt-3">
+                                <div className={`flex flex-wrap gap-2 ${isMobile ? 'mt-2' : 'mt-3'}`}>
                                   {message.actions.map((action) => (
                                     <Button
                                       key={action}
                                       size="sm"
                                       variant="outline"
-                                      className="text-xs h-7"
+                                      className={`${isMobile ? 'text-xs h-6' : 'text-xs h-7'} hover:bg-primary hover:text-primary-foreground`}
                                     >
                                       {action}
                                     </Button>
@@ -799,13 +849,13 @@ What would you like to explore?`;
                     
                     {isTyping && (
                       <div className="flex justify-start">
-                        <div className="bg-muted p-3 rounded-2xl rounded-bl-md">
+                        <div className={`bg-muted ${isMobile ? 'p-2.5' : 'p-3'} rounded-2xl rounded-bl-md`}>
                           <div className="flex items-center space-x-2">
-                            <Bot className="h-4 w-4" />
+                            <Bot className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
                             <div className="flex space-x-1">
-                              <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                              <div className={`${isMobile ? 'w-1.5 h-1.5' : 'w-2 h-2'} bg-primary rounded-full animate-bounce`}></div>
+                              <div className={`${isMobile ? 'w-1.5 h-1.5' : 'w-2 h-2'} bg-primary rounded-full animate-bounce`} style={{ animationDelay: '0.1s' }}></div>
+                              <div className={`${isMobile ? 'w-1.5 h-1.5' : 'w-2 h-2'} bg-primary rounded-full animate-bounce`} style={{ animationDelay: '0.2s' }}></div>
                             </div>
                           </div>
                         </div>
@@ -816,40 +866,40 @@ What would you like to explore?`;
                 </ScrollArea>
                 
                 {/* Input Area */}
-                <div className="p-4 border-t bg-background/80">
+                <div className={`${isMobile ? 'p-3' : 'p-4'} border-t bg-background/80 flex-shrink-0`}>
                   <div className="flex space-x-2">
                     <div className="flex-1 relative">
                       <Textarea
-                        placeholder="Ask me anything about shopping..."
+                        placeholder={isMobile ? "Ask me anything..." : "Ask me anything about shopping..."}
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        className="min-h-[44px] max-h-24 resize-none pr-20"
+                        className={`${isMobile ? 'min-h-[36px] pr-16 text-sm' : 'min-h-[44px] pr-20'} max-h-24 resize-none`}
                         rows={1}
                       />
-                      <div className="absolute right-2 top-2 flex space-x-1">
+                      <div className={`absolute ${isMobile ? 'right-1.5 top-1.5' : 'right-2 top-2'} flex space-x-1`}>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8"
+                          className={`${isMobile ? 'h-6 w-6' : 'h-8 w-8'}`}
                           onClick={handleVoiceSearch}
                           disabled={isListening}
                         >
                           {isListening ? (
                             <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1 }}>
-                              <MicOff className="h-4 w-4 text-red-500" />
+                              <MicOff className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-red-500`} />
                             </motion.div>
                           ) : (
-                            <Mic className="h-4 w-4" />
+                            <Mic className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
                           )}
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8"
+                          className={`${isMobile ? 'h-6 w-6' : 'h-8 w-8'}`}
                           onClick={handleImageSearch}
                         >
-                          <Camera className="h-4 w-4" />
+                          <Camera className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
                         </Button>
                       </div>
                     </div>
@@ -857,15 +907,15 @@ What would you like to explore?`;
                       onClick={handleSendMessage} 
                       size="icon" 
                       disabled={!inputValue.trim()}
-                      className="h-11 w-11 bg-gradient-to-r from-primary to-primary/80"
+                      className={`${isMobile ? 'h-9 w-9' : 'h-11 w-11'} bg-gradient-to-r from-primary to-primary/80 flex-shrink-0`}
                     >
-                      <Send className="h-4 w-4" />
+                      <Send className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
                     </Button>
                   </div>
                   
-                  <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+                  <div className={`flex items-center justify-between mt-2 ${isMobile ? 'text-xs' : 'text-xs'} text-muted-foreground`}>
                     <span>AI-powered shopping assistant</span>
-                    {user && <span>Personalized for {user.name}</span>}
+                    {user && <span className={isMobile ? 'truncate max-w-24' : ''}>Personalized for {user.name}</span>}
                   </div>
                 </div>
               </CardContent>
