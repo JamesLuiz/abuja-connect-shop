@@ -9,27 +9,42 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff, Building2, User, Mail, Phone, MapPin } from "lucide-react";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<"customer" | "vendor">("customer");
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login } = useAuth();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Mock authentication delay
+    // Use the authentication context
+    const success = login(email, password, userType);
+    
     setTimeout(() => {
       setIsLoading(false);
-      toast({
-        title: "Welcome back!",
-        description: "You have been successfully signed in.",
-      });
-      navigate("/");
+      if (success) {
+        toast({
+          title: "Welcome back!",
+          description: `You have been successfully signed in as a ${userType}.`,
+        });
+        navigate("/");
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Please check your credentials and try again.",
+          variant: "destructive"
+        });
+      }
     }, 1500);
   };
 
@@ -37,27 +52,41 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Mock registration delay
+    // Mock registration - create account then login
+    const success = login(email, password, userType);
+    
     setTimeout(() => {
       setIsLoading(false);
-      toast({
-        title: "Account created successfully!",
-        description: `Welcome to our platform as a ${userType}!`,
-      });
-      navigate("/");
+      if (success) {
+        toast({
+          title: "Account created successfully!",
+          description: `Welcome to our platform as a ${userType}!`,
+        });
+        navigate("/");
+      } else {
+        toast({
+          title: "Registration failed",
+          description: "There was an error creating your account.",
+          variant: "destructive"
+        });
+      }
     }, 2000);
   };
 
   const handleGoogleAuth = () => {
     setIsLoading(true);
-    // Mock Google authentication
+    // Mock Google authentication - default to customer
+    const success = login("demo@example.com", "password", "customer");
+    
     setTimeout(() => {
       setIsLoading(false);
-      toast({
-        title: "Google authentication successful!",
-        description: "You have been signed in with Google.",
-      });
-      navigate("/");
+      if (success) {
+        toast({
+          title: "Google authentication successful!",
+          description: "You have been signed in with Google.",
+        });
+        navigate("/");
+      }
     }, 1000);
   };
 
@@ -106,6 +135,35 @@ const Login = () => {
 
               {/* Sign In Tab */}
               <TabsContent value="signin" className="space-y-4 mt-6">
+                <div className="space-y-2">
+                  <Label>Account Type</Label>
+                  <Select value={userType} onValueChange={(value: "customer" | "vendor") => setUserType(value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="customer">
+                        <div className="flex items-center">
+                          <User className="w-4 h-4 mr-2" />
+                          Customer Account
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="vendor">
+                        <div className="flex items-center">
+                          <Building2 className="w-4 h-4 mr-2" />
+                          Vendor Account
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="text-xs text-muted-foreground">
+                    {userType === "customer" 
+                      ? "Demo: Use any email/password to login as Sarah Johnson" 
+                      : "Demo: Use any email/password to login as Ahmed Musa"
+                    }
+                  </div>
+                </div>
+                
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signin-email">Email</Label>
@@ -116,6 +174,8 @@ const Login = () => {
                         type="email" 
                         placeholder="Enter your email"
                         className="pl-10"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required 
                       />
                     </div>
@@ -129,6 +189,8 @@ const Login = () => {
                         type={showPassword ? "text" : "password"} 
                         placeholder="Enter your password"
                         className="pr-10"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         required 
                       />
                       <Button
@@ -161,28 +223,34 @@ const Login = () => {
 
               {/* Sign Up Tab */}
               <TabsContent value="signup" className="space-y-4 mt-6">
-                <div className="space-y-2">
-                  <Label>Account Type</Label>
-                  <Select value={userType} onValueChange={(value: "customer" | "vendor") => setUserType(value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="customer">
-                        <div className="flex items-center">
-                          <User className="w-4 h-4 mr-2" />
-                          Customer Account
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="vendor">
-                        <div className="flex items-center">
-                          <Building2 className="w-4 h-4 mr-2" />
-                          Vendor Account
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div className="space-y-2">
+                    <Label>Account Type</Label>
+                    <Select value={userType} onValueChange={(value: "customer" | "vendor") => setUserType(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="customer">
+                          <div className="flex items-center">
+                            <User className="w-4 h-4 mr-2" />
+                            Customer Account
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="vendor">
+                          <div className="flex items-center">
+                            <Building2 className="w-4 h-4 mr-2" />
+                            Vendor Account
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {userType === "customer" 
+                        ? "Demo: Use any email/password to login as Sarah Johnson" 
+                        : "Demo: Use any email/password to login as Ahmed Musa"
+                      }
+                    </div>
+                  </div>
 
                 <form onSubmit={handleSignUp} className="space-y-4">
                   {userType === "vendor" ? (
