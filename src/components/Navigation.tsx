@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Menu, X, Search, Store } from 'lucide-react';
 import ProfileDropdown from '@/components/ui/ProfileDropdown';
 import CartSidebar from '@/components/cart/CartSidebar';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import logoImage from '@/assets/logos/logo-modern-minimalist.png';
@@ -95,6 +96,7 @@ const Navigation = () => {
 
           {/* Right side buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            <ThemeToggle />
             <CartSidebar />
             {/* Conditional rendering for authenticated state */}
             {isAuthenticated ? (
@@ -131,6 +133,7 @@ const Navigation = () => {
 
           {/* Mobile right section - Profile and Cart outside hamburger */}
           <div className="md:hidden flex items-center space-x-2">
+            <ThemeToggle />
             <CartSidebar />
             {isAuthenticated && <ProfileDropdown user={user} onSignOut={handleSignOut} />}
             <Button

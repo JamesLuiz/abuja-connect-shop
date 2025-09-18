@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,23 +28,24 @@ import {
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const { user } = useAuth();
   
-  // Mock user data
-  const userData = {
-    name: 'Adebayo Johnson',
-    email: 'adebayo.johnson@gmail.com',
-    phone: '+234 809 123 4567',
-    address: 'Wuse 2, Abuja, FCT',
-    avatar: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=100&h=100&fit=crop&crop=face',
-    joinDate: 'March 2023',
-    role: 'vendor' as const,
-    isVerified: true,
-    bio: 'Passionate entrepreneur specializing in quality electronics and gadgets. Building trust through excellence.',
-    totalOrders: 156,
-    totalSpent: 850000,
-    storeRevenue: 2450000,
-    storeRating: 4.8,
-    completedSales: 342
+  // Use data from auth context
+  const userData = user || {
+    name: 'Guest User',
+    email: 'guest@example.com',
+    phone: '+234 800 000 0000',
+    address: 'Not provided',
+    avatar: '',
+    joinDate: 'Recently',
+    role: 'customer' as const,
+    isVerified: false,
+    bio: 'No bio available.',
+    totalOrders: 0,
+    totalSpent: 0,
+    storeRevenue: 0,
+    storeRating: 0,
+    completedSales: 0
   };
 
   const stats = [

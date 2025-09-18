@@ -8,6 +8,8 @@ interface User {
   isVerified: boolean;
   phone?: string;
   location?: string;
+  address?: string;
+  bio?: string;
   joinDate?: string;
   totalOrders?: number;
   totalSpent?: number;
@@ -55,12 +57,18 @@ const mockUsers = {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    // Check localStorage for persisted user data
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
   const login = (email: string, password: string, userType: 'customer' | 'vendor'): boolean => {
     // Mock authentication - in real app, this would call an API
     if (email && password) {
-      setUser(mockUsers[userType]);
+      const userData = mockUsers[userType];
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
       return true;
     }
     return false;
@@ -68,6 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('user');
   };
 
   const isAuthenticated = !!user;
