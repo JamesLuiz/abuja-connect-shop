@@ -131,10 +131,8 @@ const Navigation = () => {
             )}
           </div>
 
-          {/* Mobile right section - Profile and Cart outside hamburger */}
+          {/* Mobile right section - Profile only outside hamburger */}
           <div className="md:hidden flex items-center space-x-2">
-            <ThemeToggle />
-            <CartSidebar />
             {isAuthenticated && <ProfileDropdown user={user} onSignOut={handleSignOut} />}
             <Button
               variant="ghost"
@@ -162,6 +160,12 @@ const Navigation = () => {
               </button>
             ))}
             <div className="pt-4 pb-3 border-t border-border space-y-3">
+              {/* Theme Toggle and Cart in mobile menu */}
+              <div className="flex justify-center gap-4 px-3 pb-3">
+                <ThemeToggle />
+                <CartSidebar />
+              </div>
+              
               {!isAuthenticated && (
                 <div className="flex gap-2 px-3">
                   <Button 
