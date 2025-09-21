@@ -32,6 +32,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import AIAssistant from "@/components/AIAssistant";
+import Wishlist from "./pages/Wishlist";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -41,8 +42,8 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <AIAssistant />
           <BrowserRouter>
+          <AIAssistant />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/vendor/register" element={<VendorRegister />} /> 
@@ -60,6 +61,7 @@ const App = () => (
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/vendor-program" element={<VendorProgram />} />
             <Route path="/customer-support" element={<CustomerSupport />} />
+            <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/publish" element={<PublishArticle />} />
         <Route path="/careers" element={<Careers />} />

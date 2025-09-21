@@ -76,7 +76,7 @@ const Login = () => {
   const handleGoogleAuth = () => {
     setIsLoading(true);
     // Mock Google authentication - default to customer
-    const success = login("demo@example.com", "password", "customer");
+    const success = login("john.doe@techhub.ng", "password123", "vendor");
     
     setTimeout(() => {
       setIsLoading(false);
