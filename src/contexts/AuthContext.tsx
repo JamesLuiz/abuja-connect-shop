@@ -28,8 +28,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Mock user data
-const mockUsers = {
-  customer: {
+const mockUsers = [
+  {
     name: 'James Luiz',
     email: 'james.luiz@example.com',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
@@ -39,9 +39,10 @@ const mockUsers = {
     location: 'Wuse 2, Abuja FCT',
     joinDate: 'January 2024',
     totalOrders: 24,
-    totalSpent: 450000
+    totalSpent: 450000,
+    password: 'password123' // Add a mock password for authentication
   },
-  vendor: {
+  {
     name: 'John Doe',
     email: 'john.doe@techhub.ng',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',
@@ -52,9 +53,11 @@ const mockUsers = {
     joinDate: 'March 2023',
     storeRevenue: 2500000,
     storeRating: 4.8,
-    completedSales: 156
-  }
-};
+    completedSales: 156,
+    password: 'password123' // Add a mock password
+  },
+  // Add other mock users if needed
+];
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
@@ -65,12 +68,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (email: string, password: string, userType: 'customer' | 'vendor'): boolean => {
     // Mock authentication - in real app, this would call an API
-    if (email && password) {
-      const userData = mockUsers[userType];
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      return true;
+    const foundUser = mockUsers.find(
+        (user) => user.email === email && user.password === password && user.role === userType
+    );
+
+    if (foundUser) {
+        setUser(foundUser);
+        localStorage.setItem('user', JSON.stringify(foundUser));
+        return true;
     }
+
     return false;
   };
 

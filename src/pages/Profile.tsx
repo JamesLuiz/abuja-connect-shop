@@ -28,7 +28,7 @@ import {
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   
   // Use data from auth context
   const userData = user || {
