@@ -89,12 +89,14 @@ const Wishlist = () => {
   const addToCartFromWishlist = (item: WishlistItem) => {
     if (item.inStock) {
       addToCart({
-        id: item.id,
+        productId: item.id.toString(),
+        vendorId: 'vendor-' + item.id,
         name: item.name,
         price: item.price,
-        images: [{ view: 'front', url: item.image }],
+        quantity: 1,
+        image: item.image,
         vendor: { name: item.vendor, location: item.location },
-        quantity: 1
+        shipping: { cost: 0, estimatedDays: 3 }
       });
     }
   };

@@ -745,7 +745,7 @@ What would you like to explore?`;
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
             className={`fixed z-50 ${
               isMobile 
-                ? 'inset-0 m-2' 
+                ? 'inset-x-2 bottom-2 top-[20%] max-h-[80vh]' 
                 : 'bottom-6 right-6 w-80 h-[500px]'
             }`}
           >
