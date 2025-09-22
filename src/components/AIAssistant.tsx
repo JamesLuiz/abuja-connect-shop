@@ -722,7 +722,7 @@ What would you like to explore?`;
         {!isOpen && (
           <Button
             onClick={() => setIsOpen(true)}
-            className={`${isMobile ? 'h-14 w-14' : 'h-16 w-16'} rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-white/20`}
+            className={`${isMobile ? 'h-14 w-14' : 'h-16 w-16'} rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-primary/20 text-primary-foreground`}
             size="icon"
           >
             <motion.div
