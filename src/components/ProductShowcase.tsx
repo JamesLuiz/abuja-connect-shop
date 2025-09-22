@@ -1,20 +1,33 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Star, ShoppingCart, Heart, Eye, Search, MapPin, Filter } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Eye } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useCart } from '@/contexts/CartContext';
+import AdvancedSearchFilters from '@/components/search/AdvancedSearchFilters';
+import InfiniteScroll from '@/components/ui/InfiniteScroll';
+import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
+import ProductComparison from '@/components/product/ProductComparison';
+import RecentlyViewed from '@/components/product/RecentlyViewed';
+import SwipeableProductGallery from '@/components/product/SwipeableProductGallery';
 
 const ProductShowcase = () => {
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [locationFilter, setLocationFilter] = useState('all');
-  const [ratingFilter, setRatingFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('popular');
+  const [filters, setFilters] = useState({
+    query: '',
+    category: 'all',
+    location: 'all',
+    priceRange: [0, 500000] as [number, number],
+    rating: 'all',
+    sortBy: 'popular',
+    verified: false,
+    inStock: false
+  });
+  const [displayedVendors, setDisplayedVendors] = useState(6);
+  const [isLoading, setIsLoading] = useState(false);
+  const [compareProducts, setCompareProducts] = useState<any[]>([]);
 
+  const { addToCart } = useCart();
   const categories = [
     { id: 'all', name: 'All Vendors' },
     { id: 'electronics', name: 'Electronics' },
@@ -24,7 +37,6 @@ const ProductShowcase = () => {
     { id: 'sports', name: 'Sports' }
   ];
 
-  // Mock vendor catalogues with best-selling products
   const vendorCatalogues = [
     {
       id: 'tech-hub-abuja',
@@ -169,45 +181,83 @@ const ProductShowcase = () => {
   // Extract unique locations for filter
   const locations = [...new Set(vendorCatalogues.map(vendor => vendor.location))];
 
-  // Enhanced filtering logic
-  const filteredVendors = vendorCatalogues.filter(vendor => {
-    // Category filter
-    const categoryMatch = activeCategory === 'all' || vendor.category === activeCategory;
+  // Enhanced filtering logic with new filters structure
+  const filteredVendors = useMemo(() => {
+    return vendorCatalogues.filter(vendor => {
+      // Category filter
+      const categoryMatch = filters.category === 'all' || vendor.category === filters.category;
+      
+      // Search filter with typo tolerance
+      const searchMatch = filters.query === '' || 
+        vendor.name.toLowerCase().includes(filters.query.toLowerCase()) ||
+        vendor.description.toLowerCase().includes(filters.query.toLowerCase()) ||
+        vendor.bestSellingProduct.name.toLowerCase().includes(filters.query.toLowerCase()) ||
+        vendor.location.toLowerCase().includes(filters.query.toLowerCase()) ||
+        // Simple typo tolerance
+        vendor.name.toLowerCase().includes(filters.query.toLowerCase().slice(0, -1)) ||
+        vendor.bestSellingProduct.name.toLowerCase().includes(filters.query.toLowerCase().slice(0, -1));
+      
+      // Location filter
+      const locationMatch = filters.location === 'all' || vendor.location === filters.location;
+      
+      // Rating filter
+      const ratingMatch = filters.rating === 'all' || 
+        (filters.rating === '4.5+' && vendor.rating >= 4.5) ||
+        (filters.rating === '4.0+' && vendor.rating >= 4.0) ||
+        (filters.rating === '3.5+' && vendor.rating >= 3.5);
+      
+      // Price range filter
+      const priceMatch = vendor.bestSellingProduct.price >= filters.priceRange[0] && 
+                        vendor.bestSellingProduct.price <= filters.priceRange[1];
+      
+      // Verified filter
+      const verifiedMatch = !filters.verified || vendor.verified;
+      
+      // In stock filter (simulated)
+      const inStockMatch = !filters.inStock || Math.random() > 0.2; // 80% in stock simulation
+      
+      return categoryMatch && searchMatch && locationMatch && ratingMatch && 
+             priceMatch && verifiedMatch && inStockMatch;
+    }).sort((a, b) => {
+      // Enhanced sorting logic
+      switch (filters.sortBy) {
+        case 'rating':
+          return b.rating - a.rating;
+        case 'price-low':
+          return a.bestSellingProduct.price - b.bestSellingProduct.price;
+        case 'price-high':
+          return b.bestSellingProduct.price - a.bestSellingProduct.price;
+        case 'reviews':
+          return b.reviews - a.reviews;
+        case 'newest':
+          return Math.random() - 0.5; // Simulate newest
+        case 'distance':
+          return Math.random() - 0.5; // Simulate distance
+        default: // popular
+          return b.reviews * b.rating - a.reviews * a.rating;
+      }
+    });
+  }, [filters, vendorCatalogues]);
+
+  // Pagination logic for infinite scroll
+  const displayedVendorsList = filteredVendors.slice(0, displayedVendors);
+  const hasMore = displayedVendors < filteredVendors.length;
+
+  const loadMoreVendors = () => {
+    if (isLoading || !hasMore) return;
     
-    // Search filter
-    const searchMatch = searchQuery === '' || 
-      vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vendor.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vendor.bestSellingProduct.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vendor.location.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Location filter
-    const locationMatch = locationFilter === 'all' || vendor.location === locationFilter;
-    
-    // Rating filter
-    const ratingMatch = ratingFilter === 'all' || 
-      (ratingFilter === '4.5+' && vendor.rating >= 4.5) ||
-      (ratingFilter === '4.0+' && vendor.rating >= 4.0) ||
-      (ratingFilter === '3.5+' && vendor.rating >= 3.5);
-    
-    return categoryMatch && searchMatch && locationMatch && ratingMatch;
-  }).sort((a, b) => {
-    // Sorting logic
-    switch (sortBy) {
-      case 'rating':
-        return b.rating - a.rating;
-      case 'price-low':
-        return a.bestSellingProduct.price - b.bestSellingProduct.price;
-      case 'price-high':
-        return b.bestSellingProduct.price - a.bestSellingProduct.price;
-      case 'reviews':
-        return b.reviews - a.reviews;
-      case 'products':
-        return b.totalProducts - a.totalProducts;
-      default: // popular
-        return b.reviews * b.rating - a.reviews * a.rating;
-    }
-  });
+    setIsLoading(true);
+    // Simulate loading delay
+    setTimeout(() => {
+      setDisplayedVendors(prev => Math.min(prev + 6, filteredVendors.length));
+      setIsLoading(false);
+    }, 800);
+  };
+
+  // Reset displayed vendors when filters change
+  useMemo(() => {
+    setDisplayedVendors(6);
+  }, [filters]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-NG', {
@@ -234,110 +284,24 @@ const ProductShowcase = () => {
           </p>
         </div>
 
-        {/* Search and Filters */}
-        <div className="space-y-6 mb-12">
-          {/* Search Bar */}
-          <div className="relative max-w-2xl mx-auto">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search vendors, products, or locations..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 py-3 text-lg"
-            />
-          </div>
+        {/* Enhanced Search and Filters */}
+        <AdvancedSearchFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          categories={categories}
+          locations={locations}
+          resultCount={filteredVendors.length}
+        />
 
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-4">
-            {categories.map((category) => (
-              <Button
-                key={category.id}
-                variant={activeCategory === category.id ? "default" : "outline"}
-                onClick={() => setActiveCategory(category.id)}
-                className="px-6"
-              >
-                {category.name}
-              </Button>
-            ))}
-          </div>
-
-          {/* Advanced Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center">
-                <MapPin className="h-4 w-4 mr-1" />
-                Location
-              </label>
-              <Select value={locationFilter} onValueChange={setLocationFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Areas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Areas</SelectItem>
-                  {locations.map((location) => (
-                    <SelectItem key={location} value={location}>
-                      {location}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center">
-                <Star className="h-4 w-4 mr-1" />
-                Rating
-              </label>
-              <Select value={ratingFilter} onValueChange={setRatingFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Ratings" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Ratings</SelectItem>
-                  <SelectItem value="4.5+">4.5+ Stars</SelectItem>
-                  <SelectItem value="4.0+">4.0+ Stars</SelectItem>
-                  <SelectItem value="3.5+">3.5+ Stars</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center">
-                <Filter className="h-4 w-4 mr-1" />
-                Sort By
-              </label>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="popular">Most Popular</SelectItem>
-                  <SelectItem value="rating">Highest Rated</SelectItem>
-                  <SelectItem value="reviews">Most Reviews</SelectItem>
-                  <SelectItem value="products">Most Products</SelectItem>
-                  <SelectItem value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem value="price-high">Price: High to Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
-                Results
-              </label>
-              <div className="flex items-center h-10 px-3 py-2 bg-muted rounded-md">
-                <span className="text-sm text-muted-foreground">
-                  {filteredVendors.length} vendor{filteredVendors.length !== 1 ? 's' : ''} found
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Vendor Catalogues Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {filteredVendors.map((vendor) => (
+        {/* Vendor Catalogues Grid with Infinite Scroll */}
+        <InfiniteScroll
+          hasMore={hasMore}
+          isLoading={isLoading}
+          onLoadMore={loadMoreVendors}
+          className="mb-12"
+        >
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {displayedVendorsList.map((vendor) => (
             <Card 
               key={vendor.id} 
               className="group border-border hover:shadow-soft transition-all duration-300 hover:-translate-y-1 overflow-hidden cursor-pointer"
@@ -443,8 +407,9 @@ const ProductShowcase = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+            ))}
+          </div>
+        </InfiniteScroll>
 
         {/* View More */}
         <div className="text-center">
