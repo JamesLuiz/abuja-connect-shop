@@ -5,6 +5,8 @@ import About from '@/components/About';
 import Contact from '@/components/Contact';
 import VendorSignup from '@/components/VendorSignup';
 import Footer from '@/components/Footer';
+import QuickActions from '@/components/ui/QuickActions';
+import RecentlyViewed from '@/components/product/RecentlyViewed';
 
 const Index = () => {
   return (
@@ -12,10 +14,14 @@ const Index = () => {
       <Navigation />
       <Hero />
       <ProductShowcase />
+      <div className="container mx-auto px-4 py-8">
+        <RecentlyViewed />
+      </div>
       <About />
       <Contact />
       <VendorSignup />
       <Footer />
+      <QuickActions className="md:hidden" />
     </div>
   );
 };

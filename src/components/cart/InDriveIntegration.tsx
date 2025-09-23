@@ -1,348 +1,446 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Car, Clock, MapPin, Package, Star, Navigation } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-
-interface DeliveryBooking {
-  pickupAddress: string;
-  deliveryAddress: string;
-  packageDetails: {
-    weight: number;
-    dimensions: string;
-    fragile: boolean;
-    value: number;
-  };
-  preferredTime: string;
-  specialInstructions?: string;
-}
+import { Separator } from '@/components/ui/separator';
+import {
+  Car,
+  Clock,
+  MapPin,
+  Star,
+  Phone,
+  MessageCircle,
+  Shield,
+  Route,
+  CreditCard,
+  AlertCircle,
+  CheckCircle2
+} from 'lucide-react';
 
 interface Driver {
   id: string;
   name: string;
   rating: number;
-  estimatedTime: number;
+  completedRides: number;
+  estimatedArrival: string;
   price: number;
   vehicleType: string;
-  distance: number;
+  vehicleColor: string;
+  vehiclePlate: string;
+  isVerified: boolean;
+  profileImage?: string;
 }
 
-const InDriveIntegration = () => {
-  const [bookingData, setBookingData] = useState<DeliveryBooking>({
-    pickupAddress: '',
-    deliveryAddress: '',
-    packageDetails: {
-      weight: 0,
-      dimensions: '',
-      fragile: false,
-      value: 0,
-    },
-    preferredTime: '',
-    specialInstructions: '',
-  });
+interface InDriveIntegrationProps {
+  pickupLocation: string;
+  dropoffLocation: string;
+  onBookRide?: (driver: Driver, price: number) => void;
+}
 
-  const [availableDrivers, setAvailableDrivers] = useState<Driver[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+const InDriveIntegration = ({ pickupLocation, dropoffLocation, onBookRide }: InDriveIntegrationProps) => {
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+  const [customPrice, setCustomPrice] = useState<string>('');
+  const [step, setStep] = useState<'browse' | 'negotiate' | 'confirm'>('browse');
 
-  // Mock drivers data
-  const mockDrivers: Driver[] = [
-    {
-      id: '1',
-      name: 'Ahmed Ibrahim',
-      rating: 4.8,
-      estimatedTime: 15,
-      price: 2500,
-      vehicleType: 'Motorcycle',
-      distance: 3.2,
-    },
-    {
-      id: '2',
-      name: 'Blessing Okafor',
-      rating: 4.9,
-      estimatedTime: 20,
-      price: 3000,
-      vehicleType: 'Car',
-      distance: 4.1,
-    },
-    {
-      id: '3',
-      name: 'Musa Adamu',
-      rating: 4.7,
-      estimatedTime: 12,
-      price: 2200,
-      vehicleType: 'Motorcycle',
-      distance: 2.8,
-    },
-  ];
+  useEffect(() => {
+    loadAvailableDrivers();
+  }, [pickupLocation, dropoffLocation]);
 
-  const searchDrivers = async () => {
-    if (!bookingData.pickupAddress || !bookingData.deliveryAddress) {
-      toast({
-        title: "Missing Information",
-        description: "Please provide both pickup and delivery addresses",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSearching(true);
+  const loadAvailableDrivers = async () => {
+    setLoading(true);
     
-    // Simulate API call
+    // Mock InDrive API call
     setTimeout(() => {
-      setAvailableDrivers(mockDrivers);
-      setIsSearching(false);
-      toast({
-        title: "Drivers Found!",
-        description: `Found ${mockDrivers.length} available drivers`,
-      });
-    }, 2000);
+      const mockDrivers: Driver[] = [
+        {
+          id: 'driver1',
+          name: 'Ahmed Musa',
+          rating: 4.8,
+          completedRides: 1247,
+          estimatedArrival: '5 min',
+          price: 2500,
+          vehicleType: 'Toyota Corolla',
+          vehicleColor: 'Silver',
+          vehiclePlate: 'ABC-123-DE',
+          isVerified: true
+        },
+        {
+          id: 'driver2',
+          name: 'Fatima Ibrahim',
+          rating: 4.9,
+          completedRides: 892,
+          estimatedArrival: '8 min',
+          price: 2200,
+          vehicleType: 'Honda Civic',
+          vehicleColor: 'Black',
+          vehiclePlate: 'XYZ-789-FG',
+          isVerified: true
+        },
+        {
+          id: 'driver3',
+          name: 'Chidi Okafor',
+          rating: 4.7,
+          completedRides: 654,
+          estimatedArrival: '12 min',
+          price: 1800,
+          vehicleType: 'Kia Rio',
+          vehicleColor: 'White',
+          vehiclePlate: 'HIJ-456-KL',
+          isVerified: false
+        },
+        {
+          id: 'driver4',
+          name: 'Sarah Johnson',
+          rating: 4.9,
+          completedRides: 1523,
+          estimatedArrival: '6 min',
+          price: 2800,
+          vehicleType: 'Toyota Camry',
+          vehicleColor: 'Blue',
+          vehiclePlate: 'MNO-012-PQ',
+          isVerified: true
+        }
+      ];
+      
+      setDrivers(mockDrivers);
+      setLoading(false);
+    }, 1500);
   };
 
-  const bookDelivery = (driver: Driver) => {
+  const handleSelectDriver = (driver: Driver) => {
     setSelectedDriver(driver);
-    toast({
-      title: "Delivery Booked!",
-      description: `${driver.name} will pick up your package in ${driver.estimatedTime} minutes`,
-    });
+    setCustomPrice(driver.price.toString());
+    setStep('negotiate');
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-    }).format(price);
+  const handleNegotiatePrice = () => {
+    if (selectedDriver && customPrice) {
+      const price = parseInt(customPrice);
+      setStep('confirm');
+    }
   };
+
+  const handleConfirmBooking = () => {
+    if (selectedDriver && customPrice) {
+      const price = parseInt(customPrice);
+      onBookRide?.(selectedDriver, price);
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Car className="h-5 w-5 text-primary" />
+            <span>InDrive Integration</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Route className="h-4 w-4 text-muted-foreground animate-pulse" />
+              <span className="text-sm text-muted-foreground">
+                Finding available drivers near you...
+              </span>
+            </div>
+            <div className="space-y-2">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="border rounded-lg p-4 animate-pulse">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-12 w-12 bg-muted rounded-full"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-muted rounded w-1/3"></div>
+                      <div className="h-3 bg-muted rounded w-1/2"></div>
+                    </div>
+                    <div className="h-6 bg-muted rounded w-16"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (step === 'confirm' && selectedDriver) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <span>Confirm Booking</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {/* Trip Summary */}
+            <div className="space-y-3">
+              <div className="flex items-start space-x-3">
+                <MapPin className="h-5 w-5 text-green-600 mt-0.5" />
+                <div>
+                  <p className="font-medium">Pickup</p>
+                  <p className="text-sm text-muted-foreground">{pickupLocation}</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <MapPin className="h-5 w-5 text-red-600 mt-0.5" />
+                <div>
+                  <p className="font-medium">Drop-off</p>
+                  <p className="text-sm text-muted-foreground">{dropoffLocation}</p>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Driver Info */}
+            <div className="flex items-center space-x-4">
+              <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center">
+                <span className="text-lg font-semibold text-primary">
+                  {getInitials(selectedDriver.name)}
+                </span>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center space-x-2">
+                  <h4 className="font-semibold">{selectedDriver.name}</h4>
+                  {selectedDriver.isVerified && (
+                    <Shield className="h-4 w-4 text-blue-600" />
+                  )}
+                </div>
+                <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                  <div className="flex items-center space-x-1">
+                    <Star className="h-4 w-4 text-yellow-500" />
+                    <span>{selectedDriver.rating}</span>
+                  </div>
+                  <span>{selectedDriver.completedRides} rides</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {selectedDriver.vehicleColor} {selectedDriver.vehicleType} • {selectedDriver.vehiclePlate}
+                </p>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Price Breakdown */}
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span>Base Fare</span>
+                <span>₦{Math.floor(parseInt(customPrice) * 0.8).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Service Fee</span>
+                <span>₦{Math.floor(parseInt(customPrice) * 0.1).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Negotiated Rate</span>
+                <span>₦{Math.floor(parseInt(customPrice) * 0.1).toLocaleString()}</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between text-lg font-semibold">
+                <span>Total</span>
+                <span>₦{parseInt(customPrice).toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => setStep('negotiate')}
+              >
+                Back
+              </Button>
+              <Button 
+                className="flex-1"
+                onClick={handleConfirmBooking}
+              >
+                <CreditCard className="h-4 w-4 mr-2" />
+                Confirm & Pay
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (step === 'negotiate' && selectedDriver) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <MessageCircle className="h-5 w-5 text-primary" />
+            <span>Negotiate Price</span>
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Make a counter-offer to {selectedDriver.name}
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {/* Driver Info */}
+            <div className="flex items-center space-x-4 p-4 bg-muted/30 rounded-lg">
+              <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
+                <span className="text-sm font-semibold text-primary">
+                  {getInitials(selectedDriver.name)}
+                </span>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center space-x-2">
+                  <h4 className="font-medium">{selectedDriver.name}</h4>
+                  {selectedDriver.isVerified && (
+                    <Shield className="h-4 w-4 text-blue-600" />
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Initial offer: ₦{selectedDriver.price.toLocaleString()}
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="flex items-center space-x-1">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">{selectedDriver.estimatedArrival}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Price Negotiation */}
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="custom-price">Your Counter-Offer</Label>
+                <div className="flex items-center space-x-2 mt-2">
+                  <span className="text-lg">₦</span>
+                  <Input
+                    id="custom-price"
+                    type="number"
+                    value={customPrice}
+                    onChange={(e) => setCustomPrice(e.target.value)}
+                    className="flex-1"
+                    placeholder="Enter your price"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Suggested range: ₦{Math.floor(selectedDriver.price * 0.8).toLocaleString()} - ₦{Math.floor(selectedDriver.price * 1.2).toLocaleString()}
+                </p>
+              </div>
+
+              <div className="flex items-start space-x-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" />
+                <div className="text-sm text-amber-800">
+                  <p className="font-medium">Fair Pricing Tip</p>
+                  <p>Consider traffic, distance, and driver ratings when making your offer.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => setStep('browse')}
+              >
+                Back to Drivers
+              </Button>
+              <Button 
+                className="flex-1"
+                onClick={handleNegotiatePrice}
+                disabled={!customPrice || parseInt(customPrice) <= 0}
+              >
+                Send Offer
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center space-x-2">
           <Car className="h-5 w-5 text-primary" />
-          InDrive Delivery Service
+          <span>Available Drivers</span>
         </CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Choose from {drivers.length} drivers near you
+        </p>
       </CardHeader>
-      
-      <CardContent className="space-y-6">
-        {!selectedDriver ? (
-          <>
-            {/* Address Form */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="pickup">Pickup Address</Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="pickup"
-                    placeholder="Enter vendor/store address"
-                    className="pl-10"
-                    value={bookingData.pickupAddress}
-                    onChange={(e) => setBookingData(prev => ({
-                      ...prev,
-                      pickupAddress: e.target.value
-                    }))}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="delivery">Delivery Address</Label>
-                <div className="relative">
-                  <Navigation className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="delivery"
-                    placeholder="Enter your delivery address"
-                    className="pl-10"
-                    value={bookingData.deliveryAddress}
-                    onChange={(e) => setBookingData(prev => ({
-                      ...prev,
-                      deliveryAddress: e.target.value
-                    }))}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Package Details */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="weight">Package Weight (kg)</Label>
-                <Input
-                  id="weight"
-                  type="number"
-                  placeholder="0.5"
-                  value={bookingData.packageDetails.weight || ''}
-                  onChange={(e) => setBookingData(prev => ({
-                    ...prev,
-                    packageDetails: {
-                      ...prev.packageDetails,
-                      weight: parseFloat(e.target.value) || 0
-                    }
-                  }))}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="dimensions">Dimensions</Label>
-                <Input
-                  id="dimensions"
-                  placeholder="20x15x10 cm"
-                  value={bookingData.packageDetails.dimensions}
-                  onChange={(e) => setBookingData(prev => ({
-                    ...prev,
-                    packageDetails: {
-                      ...prev.packageDetails,
-                      dimensions: e.target.value
-                    }
-                  }))}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="value">Package Value (₦)</Label>
-                <Input
-                  id="value"
-                  type="number"
-                  placeholder="50000"
-                  value={bookingData.packageDetails.value || ''}
-                  onChange={(e) => setBookingData(prev => ({
-                    ...prev,
-                    packageDetails: {
-                      ...prev.packageDetails,
-                      value: parseFloat(e.target.value) || 0
-                    }
-                  }))}
-                />
-              </div>
-            </div>
-
-            {/* Special Instructions */}
-            <div className="space-y-2">
-              <Label htmlFor="instructions">Special Instructions (Optional)</Label>
-              <Textarea
-                id="instructions"
-                placeholder="Any special handling instructions..."
-                value={bookingData.specialInstructions}
-                onChange={(e) => setBookingData(prev => ({
-                  ...prev,
-                  specialInstructions: e.target.value
-                }))}
-              />
-            </div>
-
-            {/* Search Button */}
-            <Button 
-              onClick={searchDrivers} 
-              disabled={isSearching}
-              className="w-full"
+      <CardContent>
+        <div className="space-y-4">
+          {drivers.map((driver) => (
+            <div
+              key={driver.id}
+              className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => handleSelectDriver(driver)}
             >
-              {isSearching ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
-                  Searching for drivers...
-                </>
-              ) : (
-                'Find Available Drivers'
-              )}
-            </Button>
-
-            {/* Available Drivers */}
-            {availableDrivers.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Available Drivers</h3>
-                <div className="space-y-3">
-                  {availableDrivers.map((driver) => (
-                    <Card key={driver.id} className="p-4 hover:shadow-md transition-all duration-200 animate-fade-in">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h4 className="font-medium">{driver.name}</h4>
-                            <Badge variant="secondary" className="text-xs">
-                              <Star className="h-3 w-3 mr-1 fill-current" />
-                              {driver.rating}
-                            </Badge>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <Car className="h-3 w-3" />
-                              {driver.vehicleType}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {driver.estimatedTime} mins
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {driver.distance} km away
-                            </div>
-                            <div className="font-semibold text-foreground">
-                              {formatPrice(driver.price)}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <Button 
-                          size="sm"
-                          onClick={() => bookDelivery(driver)}
-                          className="ml-4"
-                        >
-                          Book Now
-                        </Button>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-semibold text-primary">
+                      {getInitials(driver.name)}
+                    </span>
+                  </div>
+                  
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <h4 className="font-medium">{driver.name}</h4>
+                      {driver.isVerified && (
+                        <Shield className="h-4 w-4 text-blue-600" />
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-4 w-4 text-yellow-500" />
+                        <span>{driver.rating}</span>
                       </div>
-                    </Card>
-                  ))}
+                      <span>{driver.completedRides} rides</span>
+                      <div className="flex items-center space-x-1">
+                        <Clock className="h-4 w-4" />
+                        <span>{driver.estimatedArrival}</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {driver.vehicleColor} {driver.vehicleType} • {driver.vehiclePlate}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <div className="text-lg font-bold text-primary">
+                    ₦{driver.price.toLocaleString()}
+                  </div>
+                  <Badge variant="secondary" className="text-xs">
+                    Negotiable
+                  </Badge>
                 </div>
               </div>
-            )}
-          </>
-        ) : (
-          /* Booking Confirmation */
-          <div className="text-center space-y-4 animate-scale-in">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-              <Package className="h-8 w-8 text-green-600" />
             </div>
-            
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Delivery Booked Successfully!</h3>
+          ))}
+        </div>
+
+        <div className="mt-6 p-4 bg-muted/30 rounded-lg">
+          <div className="flex items-start space-x-2">
+            <MessageCircle className="h-4 w-4 text-primary mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-primary">InDrive Advantage</p>
               <p className="text-muted-foreground">
-                {selectedDriver.name} will arrive at the pickup location in approximately {selectedDriver.estimatedTime} minutes
+                Negotiate fair prices directly with drivers. No surge pricing, just honest rates.
               </p>
             </div>
-
-            <Card className="p-4 bg-muted/50">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-medium">Driver:</span> {selectedDriver.name}
-                </div>
-                <div>
-                  <span className="font-medium">Vehicle:</span> {selectedDriver.vehicleType}
-                </div>
-                <div>
-                  <span className="font-medium">ETA:</span> {selectedDriver.estimatedTime} minutes
-                </div>
-                <div>
-                  <span className="font-medium">Cost:</span> {formatPrice(selectedDriver.price)}
-                </div>
-              </div>
-            </Card>
-
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setSelectedDriver(null);
-                setAvailableDrivers([]);
-              }}
-              className="w-full"
-            >
-              Book Another Delivery
-            </Button>
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );
