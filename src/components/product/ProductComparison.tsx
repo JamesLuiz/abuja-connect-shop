@@ -216,11 +216,14 @@ const ProductComparison = ({
                         <Button
                           className="w-full"
                           onClick={() => addToCart({
-                            id: product.id,
+                            productId: product.id.toString(),
+                            vendorId: '1',
                             name: product.name,
                             price: product.price,
                             image: product.images[0]?.url || '',
-                            vendor: product.vendor
+                            vendor: { name: product.vendor, location: 'Abuja' },
+                            quantity: 1,
+                            shipping: { cost: 0, estimatedDays: 3 }
                           })}
                           disabled={!product.inStock}
                         >

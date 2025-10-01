@@ -224,11 +224,14 @@ const RecentlyViewed = ({ className = '', limit = 8 }: RecentlyViewedProps) => {
                       onClick={(e) => {
                         e.stopPropagation();
                         addToCart({
-                          id: product.id,
+                          productId: product.id.toString(),
+                          vendorId: '1',
                           name: product.name,
                           price: product.price,
                           image: product.image,
-                          vendor: product.vendor
+                          vendor: { name: product.vendor, location: 'Abuja' },
+                          quantity: 1,
+                          shipping: { cost: 0, estimatedDays: 3 }
                         });
                       }}
                     >
@@ -250,7 +253,7 @@ const RecentlyViewed = ({ className = '', limit = 8 }: RecentlyViewedProps) => {
                 </div>
               </CardContent>
             </Card>
-          ))
+          ))}
         </div>
       </ScrollArea>
     </div>

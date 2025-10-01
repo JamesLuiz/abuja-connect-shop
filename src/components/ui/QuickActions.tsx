@@ -13,7 +13,7 @@ import {
   MapPin,
   Headphones
 } from 'lucide-react';
-import { AdvancedSearchFilters } from '@/components/search/AdvancedSearchFilters';
+import AdvancedSearchFilters from '@/components/search/AdvancedSearchFilters';
 import { useCart } from '@/contexts/CartContext';
 
 interface QuickActionsProps {
@@ -120,7 +120,26 @@ const QuickActions = ({ className = '' }: QuickActionsProps) => {
       {/* Advanced Search Sheet */}
       <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
         <SheetContent side="top" className="h-full overflow-y-auto">
-          <AdvancedSearchFilters onClose={() => setIsSearchOpen(false)} />
+          <AdvancedSearchFilters 
+            filters={{
+              query: '',
+              category: '',
+              location: '',
+              priceRange: [0, 100000],
+              rating: '',
+              sortBy: 'relevance',
+              verified: false,
+              inStock: false
+            }}
+            onFiltersChange={() => {}}
+            categories={[
+              { id: 'electronics', name: 'Electronics' },
+              { id: 'fashion', name: 'Fashion' },
+              { id: 'home', name: 'Home & Garden' }
+            ]}
+            locations={['Abuja', 'Lagos', 'Port Harcourt']}
+            resultCount={0}
+          />
         </SheetContent>
       </Sheet>
     </>
