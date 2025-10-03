@@ -166,7 +166,15 @@ const Checkout = () => {
                 </Card>
 
                 {/* AI Logistics */}
-                <AILogistics />
+                <AILogistics 
+                  destination="Abuja" 
+                  items={items.map(item => ({
+                    id: parseInt(item.productId) || 0,
+                    name: item.name,
+                    weight: 1,
+                    dimensions: { length: 10, width: 10, height: 10 }
+                  }))}
+                />
 
                 <Button 
                   onClick={() => setCurrentStep(2)} 
@@ -276,7 +284,10 @@ const Checkout = () => {
                 {/* InDrive Integration */}
                 {deliveryMethod === 'indrive' && (
                   <div className="animate-fade-in">
-                    <InDriveIntegration />
+                    <InDriveIntegration 
+                      pickupLocation={items[0]?.vendor.location || 'Abuja'} 
+                      dropoffLocation="Abuja" 
+                    />
                   </div>
                 )}
 

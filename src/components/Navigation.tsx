@@ -89,9 +89,6 @@ const Navigation = () => {
               <div className="h-2 w-2 rounded-full bg-primary animate-glow-pulse"></div>
               <span className="text-xs text-muted-foreground">Live</span>
             </div>
-            <div className="text-xs text-muted-foreground">
-              🇳🇬 Abuja's #1 Marketplace
-            </div>
           </div>
 
           {/* Right side buttons */}
