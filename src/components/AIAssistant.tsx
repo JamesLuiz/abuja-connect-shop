@@ -65,7 +65,6 @@ const AIAssistant = () => {
   const [isListening, setIsListening] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -714,20 +713,18 @@ What would you like to explore?`;
       />
 
       {/* Draggable Floating Button */}
-      <motion.div
+      <motion.button
         drag
         dragMomentum={false}
-        dragElastic={0}
+        dragElastic={0.1}
         dragConstraints={{
           top: 0,
           left: 0,
           right: typeof window !== 'undefined' ? window.innerWidth - (isMobile ? 56 : 80) : 0,
           bottom: typeof window !== 'undefined' ? window.innerHeight - (isMobile ? 56 : 80) : 0,
         }}
-        onDragEnd={(event, info) => {
-          setButtonPosition({ x: info.point.x, y: info.point.y });
-        }}
-        className={`fixed ${isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'} z-50 cursor-move`}
+        onClick={() => setIsOpen(true)}
+        className={`fixed ${isMobile ? 'bottom-4 right-4 h-14 w-14' : 'bottom-6 right-6 h-20 w-20'} z-50 cursor-move rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-primary/20 text-primary-foreground touch-none flex items-center justify-center`}
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
@@ -735,20 +732,14 @@ What would you like to explore?`;
         whileTap={{ scale: 0.95 }}
       >
         {!isOpen && (
-          <Button
-            onClick={() => setIsOpen(true)}
-            className={`${isMobile ? 'h-14 w-14' : 'h-20 w-20'} rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-primary/20 text-primary-foreground touch-none`}
-            size="icon"
+          <motion.div
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           >
-            <motion.div
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            >
-              <Sparkles className={`${isMobile ? 'h-6 w-6' : 'h-9 w-9'} text-white`} />
-            </motion.div>
-          </Button>
+            <Sparkles className={`${isMobile ? 'h-6 w-6' : 'h-9 w-9'} text-white`} />
+          </motion.div>
         )}
-      </motion.div>
+      </motion.button>
 
       {/* Chat Interface */}
       <AnimatePresence>
