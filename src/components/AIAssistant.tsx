@@ -732,7 +732,7 @@ What would you like to explore?`;
           }
         }}
         className={`fixed ${isMobile ? 'h-14 w-14' : 'h-20 w-20'} z-50 cursor-grab active:cursor-grabbing rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl border-2 border-primary/20 text-primary-foreground touch-none flex items-center justify-center`}
-        style={{ bottom: isMobile ? '16px' : '24px', right: isMobile ? '16px' : '24px' }}
+        style={{ bottom: isMobile ? '100px' : '120px', right: isMobile ? '16px' : '24px' }}
         initial={{ scale: 0, opacity: 1 }}
         animate={{ 
           scale: 1,

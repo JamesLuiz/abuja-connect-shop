@@ -63,8 +63,8 @@ const QuickActions = ({ className = '' }: QuickActionsProps) => {
   return (
     <>
       <div className={`fixed bottom-4 left-4 right-4 z-40 ${className}`}>
-        <div className="flex items-center justify-between bg-background/95 backdrop-blur-sm border border-border rounded-full px-4 py-2 shadow-lg">
-          <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-between bg-background/95 backdrop-blur-sm border border-border rounded-full px-6 py-3 shadow-lg">
+          <div className="flex items-center gap-4 md:gap-6 flex-1 justify-around">
             {quickActionItems.map((item, index) => {
               const Icon = item.icon;
               return (
@@ -80,29 +80,17 @@ const QuickActions = ({ className = '' }: QuickActionsProps) => {
                 </Button>
               );
             })}
-          </div>
-
-          <div className="flex items-center space-x-2">
+            
             <Button
               variant="ghost"
               size="sm"
-              className="relative h-12 w-12 p-0"
-              onClick={() => window.location.href = '/wishlist'}
-            >
-              <Heart className="h-5 w-5 text-muted-foreground" />
-              <span className="text-xs mt-1">Wishlist</span>
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              className="relative h-12 w-12 p-0"
+              className="relative flex-col h-12 w-12 p-0"
               onClick={() => {
                 // TODO: Open cart sidebar
                 console.log('Cart sidebar not implemented yet');
               }}
             >
-              <ShoppingCart className="h-5 w-5 text-primary" />
+              <ShoppingCart className="h-5 w-5 text-primary mb-1" />
               {cartItemCount > 0 && (
                 <Badge
                   variant="destructive"
@@ -111,7 +99,7 @@ const QuickActions = ({ className = '' }: QuickActionsProps) => {
                   {cartItemCount}
                 </Badge>
               )}
-              <span className="text-xs mt-1">Cart</span>
+              <span className="text-xs">Cart</span>
             </Button>
           </div>
         </div>
