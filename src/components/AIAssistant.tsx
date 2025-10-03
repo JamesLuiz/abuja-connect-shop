@@ -65,6 +65,7 @@ const AIAssistant = () => {
   const [isListening, setIsListening] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -716,19 +717,29 @@ What would you like to explore?`;
       <motion.button
         drag
         dragMomentum={false}
-        dragElastic={0.1}
+        dragElastic={0}
         dragConstraints={{
           top: 0,
           left: 0,
           right: typeof window !== 'undefined' ? window.innerWidth - (isMobile ? 56 : 80) : 0,
           bottom: typeof window !== 'undefined' ? window.innerHeight - (isMobile ? 56 : 80) : 0,
         }}
-        onClick={() => setIsOpen(true)}
-        className={`fixed ${isMobile ? 'bottom-4 right-4 h-14 w-14' : 'bottom-6 right-6 h-20 w-20'} z-50 cursor-move rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-primary/20 text-primary-foreground touch-none flex items-center justify-center`}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={() => setIsDragging(false)}
+        onClick={(e) => {
+          if (!isDragging) {
+            setIsOpen(true);
+          }
+        }}
+        className={`fixed ${isMobile ? 'h-14 w-14' : 'h-20 w-20'} z-50 cursor-grab active:cursor-grabbing rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl border-2 border-primary/20 text-primary-foreground touch-none flex items-center justify-center`}
+        style={{ bottom: isMobile ? '16px' : '24px', right: isMobile ? '16px' : '24px' }}
+        initial={{ scale: 0, opacity: 1 }}
+        animate={{ 
+          scale: 1,
+          opacity: isDragging ? 1 : 0.7
+        }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.05, opacity: 1 }}
         whileTap={{ scale: 0.95 }}
       >
         {!isOpen && (
