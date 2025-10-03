@@ -65,6 +65,7 @@ const AIAssistant = () => {
   const [isListening, setIsListening] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -712,24 +713,38 @@ What would you like to explore?`;
         className="hidden"
       />
 
-      {/* Floating Button */}
+      {/* Draggable Floating Button */}
       <motion.div
-        className={`fixed ${isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'} z-50`}
+        drag
+        dragMomentum={false}
+        dragElastic={0}
+        dragConstraints={{
+          top: 0,
+          left: 0,
+          right: typeof window !== 'undefined' ? window.innerWidth - (isMobile ? 56 : 80) : 0,
+          bottom: typeof window !== 'undefined' ? window.innerHeight - (isMobile ? 56 : 80) : 0,
+        }}
+        onDragEnd={(event, info) => {
+          setButtonPosition({ x: info.point.x, y: info.point.y });
+        }}
+        className={`fixed ${isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'} z-50 cursor-move`}
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
         {!isOpen && (
           <Button
             onClick={() => setIsOpen(true)}
-            className={`${isMobile ? 'h-14 w-14' : 'h-16 w-16'} rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-primary/20 text-primary-foreground`}
+            className={`${isMobile ? 'h-14 w-14' : 'h-20 w-20'} rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-primary/20 text-primary-foreground touch-none`}
             size="icon"
           >
             <motion.div
               animate={{ rotate: [0, 360] }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
             >
-              <Sparkles className={`${isMobile ? 'h-6 w-6' : 'h-7 w-7'} text-white`} />
+              <Sparkles className={`${isMobile ? 'h-6 w-6' : 'h-9 w-9'} text-white`} />
             </motion.div>
           </Button>
         )}
@@ -746,55 +761,55 @@ What would you like to explore?`;
             className={`fixed z-50 ${
               isMobile 
                 ? 'inset-x-2 bottom-2 top-[20%] max-h-[80vh]' 
-                : 'bottom-6 right-6 w-80 h-[500px]'
+                : 'bottom-6 right-6 w-[480px] h-[650px] md:w-[500px] lg:w-[520px] lg:h-[680px]'
             }`}
           >
             <Card className="w-full h-full shadow-2xl border-2 border-primary/20 bg-background/95 backdrop-blur-lg flex flex-col">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground rounded-t-lg flex-shrink-0">
-                <div className="flex items-center space-x-2">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground rounded-t-lg flex-shrink-0">
+                <div className="flex items-center space-x-3">
                   <motion.div
                     animate={{ rotate: [0, 360] }}
                     transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                   >
-                    <Bot className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
+                    <Bot className={`${isMobile ? 'h-4 w-4' : 'h-6 w-6'}`} />
                   </motion.div>
                   <div>
-                    <CardTitle className={`${isMobile ? 'text-sm' : 'text-base'}`}>AI Shopping Assistant</CardTitle>
-                    <p className={`text-primary-foreground/80 ${isMobile ? 'text-xs' : 'text-xs'}`}>Powered by AI</p>
+                    <CardTitle className={`${isMobile ? 'text-sm' : 'text-lg font-semibold'}`}>AI Shopping Assistant</CardTitle>
+                    <p className={`text-primary-foreground/80 ${isMobile ? 'text-xs' : 'text-sm'}`}>Powered by AI</p>
                   </div>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsOpen(false)}
-                  className="h-7 w-7 text-primary-foreground hover:bg-white/20"
+                  className={`${isMobile ? 'h-7 w-7' : 'h-9 w-9'} text-primary-foreground hover:bg-white/20`}
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className={`${isMobile ? 'h-3.5 w-3.5' : 'h-5 w-5'}`} />
                 </Button>
               </CardHeader>
               
               <CardContent className="flex flex-col flex-1 p-0 min-h-0">
                 {/* AI Features Quick Access */}
-                <div className={`${isMobile ? 'p-1.5' : 'p-2'} border-b bg-muted/30 flex-shrink-0`}>
-                  <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3'} gap-1.5`}>
+                <div className={`${isMobile ? 'p-1.5' : 'p-3'} border-b bg-muted/30 flex-shrink-0`}>
+                  <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3'} gap-2`}>
                     {aiFeatures.slice(0, 6).map((feature) => (
                       <Button
                         key={feature.id}
                         variant="ghost"
                         size="sm"
-                        className={`h-auto ${isMobile ? 'p-1' : 'p-1.5'} flex flex-col items-center gap-0.5 hover:bg-primary/10 text-center`}
+                        className={`h-auto ${isMobile ? 'p-1' : 'p-2.5'} flex flex-col items-center gap-1 hover:bg-primary/10 text-center transition-colors`}
                         onClick={feature.action}
                       >
-                        <feature.icon className={`${isMobile ? 'h-3 w-3' : 'h-3.5 w-3.5'}`} />
-                        <span className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} leading-tight`}>{feature.name}</span>
+                        <feature.icon className={`${isMobile ? 'h-3 w-3' : 'h-5 w-5'}`} />
+                        <span className={`${isMobile ? 'text-[9px]' : 'text-xs font-medium'} leading-tight`}>{feature.name}</span>
                       </Button>
                     ))}
                   </div>
                 </div>
 
                 {/* Messages */}
-                <ScrollArea className={`flex-1 ${isMobile ? 'p-2' : 'p-4'} min-h-0`}>
-                  <div className={`space-y-${isMobile ? '3' : '4'}`}>
+                <ScrollArea className={`flex-1 ${isMobile ? 'p-2' : 'p-5'} min-h-0`}>
+                  <div className={`space-y-${isMobile ? '3' : '5'}`}>
                     {messages.map((message) => (
                       <div
                         key={message.id}
@@ -805,7 +820,7 @@ What would you like to explore?`;
                             message.role === 'user'
                               ? 'bg-primary text-primary-foreground ml-auto rounded-2xl rounded-br-md'
                               : 'bg-muted text-foreground rounded-2xl rounded-bl-md'
-                          } ${isMobile ? 'p-2.5' : 'p-3'}`}
+                          } ${isMobile ? 'p-2.5' : 'p-4'}`}
                         >
                           <div className="flex items-start space-x-2">
                             {message.role === 'assistant' && (
@@ -813,13 +828,13 @@ What would you like to explore?`;
                                 animate={{ rotate: [0, 360] }}
                                 transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                               >
-                                <Bot className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'} mt-0.5 flex-shrink-0`} />
+                                <Bot className={`${isMobile ? 'h-3.5 w-3.5' : 'h-5 w-5'} mt-0.5 flex-shrink-0`} />
                               </motion.div>
                             )}
-                            {message.role === 'user' && <User className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'} mt-0.5 flex-shrink-0`} />}
+                            {message.role === 'user' && <User className={`${isMobile ? 'h-3.5 w-3.5' : 'h-5 w-5'} mt-0.5 flex-shrink-0`} />}
                             
                             <div className="flex-1 min-w-0">
-                              <div className={`whitespace-pre-wrap ${isMobile ? 'text-xs' : 'text-sm'} leading-relaxed`}>{message.content}</div>
+                              <div className={`whitespace-pre-wrap ${isMobile ? 'text-xs' : 'text-[15px]'} leading-relaxed`}>{message.content}</div>
                               
                               {/* Render products */}
                               {message.products && message.products.length > 0 && (
@@ -869,7 +884,7 @@ What would you like to explore?`;
                   <div ref={messagesEndRef} />
                 </ScrollArea>
                 {/* Input Area */}
-                <div className={`${isMobile ? 'p-2' : 'p-3'} border-t bg-background/80 flex-shrink-0`}>
+                <div className={`${isMobile ? 'p-2' : 'p-4'} border-t bg-background/80 flex-shrink-0`}>
                   <div className="flex space-x-2">
                     <div className="flex-1 relative">
                       <Textarea
@@ -877,32 +892,32 @@ What would you like to explore?`;
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        className={`${isMobile ? 'min-h-[32px] pr-14 text-xs' : 'min-h-[36px] pr-16 text-sm'} max-h-20 resize-none`}
+                        className={`${isMobile ? 'min-h-[32px] pr-14 text-xs' : 'min-h-[44px] pr-20 text-[15px]'} max-h-24 resize-none`}
                         rows={1}
                       />
-                      <div className={`absolute ${isMobile ? 'right-1 top-1' : 'right-1.5 top-1.5'} flex space-x-0.5`}>
+                      <div className={`absolute ${isMobile ? 'right-1 top-1' : 'right-2 top-2'} flex space-x-1`}>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`}
+                          className={`${isMobile ? 'h-5 w-5' : 'h-8 w-8'}`}
                           onClick={handleVoiceSearch}
                           disabled={isListening}
                         >
                           {isListening ? (
                             <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1 }}>
-                              <MicOff className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'} text-red-500`} />
+                              <MicOff className={`${isMobile ? 'h-2.5 w-2.5' : 'h-4 w-4'} text-red-500`} />
                             </motion.div>
                           ) : (
-                            <Mic className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'}`} />
+                            <Mic className={`${isMobile ? 'h-2.5 w-2.5' : 'h-4 w-4'}`} />
                           )}
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`}
+                          className={`${isMobile ? 'h-5 w-5' : 'h-8 w-8'}`}
                           onClick={handleImageSearch}
                         >
-                          <Camera className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'}`} />
+                          <Camera className={`${isMobile ? 'h-2.5 w-2.5' : 'h-4 w-4'}`} />
                         </Button>
                       </div>
                     </div>
@@ -910,9 +925,9 @@ What would you like to explore?`;
                       onClick={handleSendMessage} 
                       size="icon" 
                       disabled={!inputValue.trim()}
-                      className={`${isMobile ? 'h-8 w-8' : 'h-9 w-9'} bg-gradient-to-r from-primary to-primary/80 flex-shrink-0`}
+                      className={`${isMobile ? 'h-8 w-8' : 'h-11 w-11'} bg-primary hover:bg-primary/90 flex-shrink-0`}
                     >
-                      <Send className={`${isMobile ? 'h-3 w-3' : 'h-3.5 w-3.5'}`} />
+                      <Send className={`${isMobile ? 'h-3 w-3' : 'h-5 w-5'}`} />
                     </Button>
                   </div>
                   
