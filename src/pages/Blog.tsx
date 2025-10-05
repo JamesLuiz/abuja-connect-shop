@@ -1,10 +1,11 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SocialBlogCard from '@/components/SocialBlogCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Search, 
   Calendar, 
@@ -14,17 +15,144 @@ import {
   ArrowRight,
   Eye,
   MessageCircle,
-  Share2
+  Share2,
+  Home,
+  Sparkles,
+  Users
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Blog = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [articles, setArticles] = useState([]);
+  const [trendingArticles, setTrendingArticles] = useState([]);
+  const [userTimeline, setUserTimeline] = useState([]);
+  const [trendingTopics, setTrendingTopics] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
 
   const categories = ['All', 'Business Tips', 'E-commerce', 'Technology', 'Marketing', 'Success Stories'];
+
+  // Fetch data from API
+  useEffect(() => {
+    fetchArticles();
+    fetchTrendingArticles();
+    fetchTrendingTopics();
+    if (user) {
+      fetchUserTimeline();
+    }
+  }, [user]);
+
+  const fetchArticles = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/blog');
+      if (response.ok) {
+        const data = await response.json();
+        setArticles(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch articles:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTrendingArticles = async () => {
+    try {
+      const response = await fetch('/api/blog/trending?limit=5');
+      if (response.ok) {
+        const data = await response.json();
+        setTrendingArticles(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch trending articles:', error);
+    }
+  };
+
+  const fetchUserTimeline = async () => {
+    try {
+      const response = await fetch('/api/blog/timeline', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUserTimeline(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch timeline:', error);
+    }
+  };
+
+  const fetchTrendingTopics = async () => {
+    try {
+      const response = await fetch('/api/blog/topics/trending?limit=10');
+      if (response.ok) {
+        const data = await response.json();
+        setTrendingTopics(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch trending topics:', error);
+    }
+  };
+
+  const handleLike = (articleId: string) => {
+    // Update local state optimistically
+    setArticles(prev => prev.map(article => 
+      article._id === articleId 
+        ? { ...article, likes: article.likes.includes(user?._id) 
+            ? article.likes.filter(id => id !== user._id)
+            : [...article.likes, user._id]
+          }
+        : article
+    ));
+  };
+
+  const handleComment = (articleId: string, content: string) => {
+    // Update local state optimistically
+    setArticles(prev => prev.map(article => 
+      article._id === articleId 
+        ? { ...article, comments: [...article.comments, { 
+            _id: Date.now().toString(),
+            userId: user._id,
+            content,
+            createdAt: new Date().toISOString(),
+            likes: []
+          }]
+          }
+        : article
+    ));
+  };
+
+  const handleRepost = (articleId: string) => {
+    // Update local state optimistically
+    setArticles(prev => prev.map(article => 
+      article._id === articleId 
+        ? { ...article, reposts: [...article.reposts, {
+            _id: Date.now().toString(),
+            userId: user._id,
+            createdAt: new Date().toISOString()
+          }]
+          }
+        : article
+    ));
+  };
+
+  const handleShare = (articleId: string) => {
+    // Update local state optimistically
+    setArticles(prev => prev.map(article => 
+      article._id === articleId 
+        ? { ...article, shares: [...article.shares, user._id] }
+        : article
+    ));
+  };
 
   const blogPosts = [
     {
@@ -192,129 +320,131 @@ const Blog = () => {
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
-            {/* Featured Posts */}
-            {selectedCategory === 'All' && searchQuery === '' && (
-              <section className="mb-12">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="all" className="flex items-center space-x-2">
+                  <Home className="h-4 w-4" />
+                  <span>All</span>
+                </TabsTrigger>
+                <TabsTrigger value="trending" className="flex items-center space-x-2">
+                  <TrendingUp className="h-4 w-4" />
+                  <span>Trending</span>
+                </TabsTrigger>
+                <TabsTrigger value="timeline" className="flex items-center space-x-2">
+                  <Users className="h-4 w-4" />
+                  <span>Timeline</span>
+                </TabsTrigger>
+                <TabsTrigger value="ai" className="flex items-center space-x-2">
+                  <Sparkles className="h-4 w-4" />
+                  <span>AI</span>
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="all" className="space-y-6">
+                {/* Category Filter */}
+                <div className="flex flex-wrap gap-3">
+                  {categories.map((category) => (
+                    <Button
+                      key={category}
+                      variant={selectedCategory === category ? "default" : "outline"}
+                      onClick={() => setSelectedCategory(category)}
+                      className="rounded-full"
+                    >
+                      {category}
+                    </Button>
+                  ))}
+                </div>
+
+                {/* Articles */}
+                <div className="space-y-6">
+                  {loading ? (
+                    <div className="text-center py-12">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      <p className="mt-2 text-muted-foreground">Loading articles...</p>
+                    </div>
+                  ) : articles.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold mb-2">No articles found</h3>
+                      <p className="text-muted-foreground">Try adjusting your search terms or category filter.</p>
+                    </div>
+                  ) : (
+                    articles.map((article) => (
+                      <SocialBlogCard
+                        key={article._id}
+                        article={article}
+                        onLike={handleLike}
+                        onComment={handleComment}
+                        onRepost={handleRepost}
+                        onShare={handleShare}
+                      />
+                    ))
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="trending" className="space-y-6">
                 <h2 className="text-2xl font-bold mb-6 flex items-center">
                   <TrendingUp className="h-6 w-6 mr-2 text-primary" />
-                  Featured Articles
+                  Trending Articles
                 </h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {featuredPosts.map((post) => (
-                    <Card key={post.id} className="overflow-hidden hover:shadow-elegant transition-all duration-300">
-                      <div className="aspect-video bg-secondary/30 relative">
-                        <Badge className="absolute top-3 left-3 bg-primary">Featured</Badge>
-                      </div>
-                      <CardContent className="p-6">
-                        <Badge variant="outline" className="mb-3">{post.category}</Badge>
-                        <h3 className="text-xl font-bold mb-3 line-clamp-2">{post.title}</h3>
-                        <p className="text-muted-foreground mb-4 line-clamp-2">{post.excerpt}</p>
-                        
-                        <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                          <div className="flex items-center space-x-4">
-                            <span className="flex items-center">
-                              <Calendar className="h-4 w-4 mr-1" />
-                              {new Date(post.publishDate).toLocaleDateString()}
-                            </span>
-                            <span className="flex items-center">
-                              <Clock className="h-4 w-4 mr-1" />
-                              {post.readTime}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={post.authorImage} />
-                              <AvatarFallback>{post.author.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm font-medium">{post.author}</span>
-                          </div>
-                          <Button variant="ghost" size="sm" className="group">
-                            Read More
-                            <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Regular Posts */}
-            <section>
-              <h2 className="text-2xl font-bold mb-6">
-                {selectedCategory === 'All' ? 'Latest Articles' : `${selectedCategory} Articles`}
-              </h2>
-              
-              {filteredPosts.length === 0 ? (
-                <div className="text-center py-12">
-                  <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">No articles found</h3>
-                  <p className="text-muted-foreground">Try adjusting your search terms or category filter.</p>
-                </div>
-              ) : (
                 <div className="space-y-6">
-                  {(selectedCategory === 'All' && searchQuery === '' ? regularPosts : filteredPosts).map((post) => (
-                    <Card key={post.id} className="hover:shadow-elegant transition-all duration-300">
-                      <div className="md:flex">
-                        <div className="md:w-48 aspect-video md:aspect-square bg-secondary/30"></div>
-                        <CardContent className="flex-1 p-6">
-                          <div className="flex items-start justify-between mb-3">
-                            <Badge variant="outline">{post.category}</Badge>
-                            <div className="flex items-center space-x-3 text-sm text-muted-foreground">
-                              <span className="flex items-center">
-                                <Eye className="h-4 w-4 mr-1" />
-                                {post.views}
-                              </span>
-                              <span className="flex items-center">
-                                <MessageCircle className="h-4 w-4 mr-1" />
-                                {post.comments}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          <h3 className="text-xl font-bold mb-3">{post.title}</h3>
-                          <p className="text-muted-foreground mb-4">{post.excerpt}</p>
-                          
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                              <div className="flex items-center space-x-2">
-                                <Avatar className="h-6 w-6">
-                                  <AvatarImage src={post.authorImage} />
-                                  <AvatarFallback>{post.author.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                                </Avatar>
-                                <span>{post.author}</span>
-                              </div>
-                              <span className="flex items-center">
-                                <Calendar className="h-4 w-4 mr-1" />
-                                {new Date(post.publishDate).toLocaleDateString()}
-                              </span>
-                              <span className="flex items-center">
-                                <Clock className="h-4 w-4 mr-1" />
-                                {post.readTime}
-                              </span>
-                            </div>
-                            
-                            <div className="flex items-center space-x-2">
-                              <Button variant="ghost" size="sm">
-                                <Share2 className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm" className="group">
-                                Read More
-                                <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </div>
-                    </Card>
+                  {trendingArticles.map((article) => (
+                    <SocialBlogCard
+                      key={article._id}
+                      article={article}
+                      onLike={handleLike}
+                      onComment={handleComment}
+                      onRepost={handleRepost}
+                      onShare={handleShare}
+                    />
                   ))}
                 </div>
-              )}
-            </section>
+              </TabsContent>
+
+              <TabsContent value="timeline" className="space-y-6">
+                <h2 className="text-2xl font-bold mb-6 flex items-center">
+                  <Users className="h-6 w-6 mr-2 text-primary" />
+                  Your Timeline
+                </h2>
+                {user ? (
+                  <div className="space-y-6">
+                    {userTimeline.map((article) => (
+                      <SocialBlogCard
+                        key={article._id}
+                        article={article}
+                        onLike={handleLike}
+                        onComment={handleComment}
+                        onRepost={handleRepost}
+                        onShare={handleShare}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">Login Required</h3>
+                    <p className="text-muted-foreground mb-4">Sign in to see your personalized timeline.</p>
+                    <Button onClick={() => navigate('/login')}>Sign In</Button>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="ai" className="space-y-6">
+                <h2 className="text-2xl font-bold mb-6 flex items-center">
+                  <Sparkles className="h-6 w-6 mr-2 text-primary" />
+                  AI-Powered Content
+                </h2>
+                <div className="text-center py-12">
+                  <Sparkles className="h-16 w-16 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">AI Content Assistant</h3>
+                  <p className="text-muted-foreground mb-4">Get AI-powered suggestions for your articles.</p>
+                  <Button onClick={() => navigate('/blog/publish')}>
+                    Create with AI
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
 
           {/* Sidebar */}
@@ -336,7 +466,7 @@ const Blog = () => {
                         variant="ghost"
                         className="w-full justify-start text-left p-2 h-auto"
                       >
-                        #{topic}
+                        #{topic._id} ({topic.count})
                       </Button>
                     ))}
                   </div>

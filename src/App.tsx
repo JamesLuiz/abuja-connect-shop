@@ -21,6 +21,7 @@ import HowItWorks from "@/pages/HowItWorks";
 import VendorProgram from "@/pages/VendorProgram";
 import CustomerSupport from "@/pages/CustomerSupport";
 import Blog from "@/pages/Blog";
+import Analytics from "@/pages/Analytics";
 import Careers from "@/pages/Careers";
 import PublishArticle from "@/pages/PublishArticle";
 import JobApplication from "@/pages/JobApplication";
@@ -28,6 +29,7 @@ import JobDetails from "@/pages/JobDetails";
 import CategoryVendors from "@/pages/CategoryVendors";
 import VendorsMarketplace from "@/pages/VendorsMarketplace";
 import Login from "@/pages/Login";
+import OAuthCallback from "@/pages/OAuthCallback";
 import AdminDashboard from "@/pages/AdminDashboard";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -64,12 +66,14 @@ const App = () => (
             <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/publish" element={<PublishArticle />} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/careers/apply/:jobId" element={<JobApplication />} />
         <Route path="/careers/job/:jobId" element={<JobDetails />} />
             <Route path="/category/:category" element={<CategoryVendors />} />
             <Route path="/vendors" element={<VendorsMarketplace />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/auth/callback" element={<OAuthCallback />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
