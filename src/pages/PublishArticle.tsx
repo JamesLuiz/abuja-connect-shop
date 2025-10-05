@@ -1,5 +1,6 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import AIBlogEditor from '@/components/AIBlogEditor';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +13,8 @@ import {
   XCircle,
   ArrowLeft,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
+  Sparkles
 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -28,7 +30,7 @@ const PublishArticle = () => {
     category: '',
     excerpt: '',
     content: '',
-    tags: ''
+    tags: []
   });
   const [articleFile, setArticleFile] = useState<File | null>(null);
   const [isReviewing, setIsReviewing] = useState(false);
@@ -152,6 +154,13 @@ const PublishArticle = () => {
             <p className="text-muted-foreground text-lg">
               Share your expertise and insights with the Abuja E-Mall community
             </p>
+            
+            <div className="flex items-center space-x-2 mt-4">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <span className="text-sm text-muted-foreground">
+                AI-powered content creation and optimization
+              </span>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
@@ -249,15 +258,13 @@ const PublishArticle = () => {
                   />
                 </div>
 
+                {/* AI-Powered Content Editor */}
                 <div>
-                  <Label htmlFor="content">Article Preview</Label>
-                  <Textarea
-                    id="content"
-                    name="content"
-                    value={formData.content}
-                    onChange={handleInputChange}
-                    placeholder="Provide a preview or key points from your article"
-                    rows={6}
+                  <Label>Article Content with AI Assistant</Label>
+                  <AIBlogEditor
+                    onContentChange={(content) => setFormData(prev => ({ ...prev, content }))}
+                    onTagsChange={(tags) => setFormData(prev => ({ ...prev, tags }))}
+                    onTitleChange={(title) => setFormData(prev => ({ ...prev, title }))}
                   />
                 </div>
               </CardContent>

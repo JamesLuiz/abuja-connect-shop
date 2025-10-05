@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,77 +18,185 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // vendor controlled fields
+  const [businessName, setBusinessName] = useState('');
+  const [contactPerson, setContactPerson] = useState('');
+  const [businessPhone, setBusinessPhone] = useState('');
+  const [businessAddress, setBusinessAddress] = useState('');
+  const [businessCategory, setBusinessCategory] = useState('');
   
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login } = useAuth();
+  const { login, registerCustomer, registerVendor, googleClientId } = useAuth();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Use the authentication context
-    const success = login(email, password, userType);
-    
-    setTimeout(() => {
+    try {
+      const success = await login(email, password, userType);
       setIsLoading(false);
       if (success) {
-        toast({
-          title: "Welcome back!",
-          description: `You have been successfully signed in as a ${userType}.`,
-        });
-        navigate("/");
+        toast({ title: 'Welcome back!', description: `Signed in as ${userType}` });
+        navigate('/');
       } else {
-        toast({
-          title: "Login failed",
-          description: "Please check your credentials and try again.",
-          variant: "destructive"
-        });
+        toast({ title: 'Login failed', description: 'Please check your credentials and try again.', variant: 'destructive' });
       }
-    }, 1500);
+    } catch (e) {
+      setIsLoading(false);
+      toast({ title: 'Login error', description: 'An error occurred while signing in.', variant: 'destructive' });
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Mock registration - create account then login
-    const success = login(email, password, userType);
-    
-    setTimeout(() => {
-      setIsLoading(false);
-      if (success) {
-        toast({
-          title: "Account created successfully!",
-          description: `Welcome to our platform as a ${userType}!`,
-        });
-        navigate("/");
+    try {
+  if (userType === 'customer') {
+        // build a minimal payload from the form fields present in the UI
+        const payload = { email, password } as any;
+        const res = await registerCustomer(payload);
+        setIsLoading(false);
+        if (res) {
+          toast({ title: 'Account created', description: 'Customer account created successfully' });
+          // attempt login
+          const success = await login(email, password, userType);
+          if (success) navigate('/');
+        } else {
+          toast({ title: 'Registration failed', description: 'Could not create account', variant: 'destructive' });
+        }
       } else {
-        toast({
-          title: "Registration failed",
-          description: "There was an error creating your account.",
-          variant: "destructive"
-        });
+        const payload = {
+          email,
+          password,
+          businessName,
+          fullName: contactPerson,
+          businessPhoneNumber: businessPhone,
+          businessAddress,
+          businessCategory,
+        } as any;
+        const res = await registerVendor(payload);
+        setIsLoading(false);
+        if (res) {
+          toast({ title: 'Vendor account created', description: 'Vendor created successfully' });
+          const success = await login(email, password, userType);
+          if (success) navigate('/');
+        } else {
+          toast({ title: 'Registration failed', description: 'Could not create vendor account', variant: 'destructive' });
+        }
       }
-    }, 2000);
+    } catch (e) {
+      setIsLoading(false);
+      toast({ title: 'Registration error', description: 'An error occurred while creating your account', variant: 'destructive' });
+    }
   };
 
-  const handleGoogleAuth = () => {
+  const handleGoogleAuth = async () => {
     setIsLoading(true);
-    // Mock Google authentication - default to customer
-    const success = login("john.doe@techhub.ng", "password123", "vendor");
-    
-    setTimeout(() => {
-      setIsLoading(false);
-      if (success) {
-        toast({
-          title: "Google authentication successful!",
-          description: "You have been signed in with Google.",
-        });
-        navigate("/");
+    // Fallback: open Google OAuth redirect URL from backend
+    try {
+  const apiUrl = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) || import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      // The backend exposes GET /api/auth/google which returns { url }
+      const urlRes = await fetch(`${apiUrl}/api/auth/google`);
+      const json = await urlRes.json();
+      if (urlRes.ok && json?.url) {
+        // Redirect the browser to the Google OAuth URL (callback handled on backend)
+        window.location.href = json.url;
+      } else {
+        setIsLoading(false);
+        toast({ title: 'Google auth error', description: 'Could not initiate Google OAuth', variant: 'destructive' });
       }
-    }, 1000);
+    } catch (e) {
+      setIsLoading(false);
+      toast({ title: 'Google auth error', description: 'An error occurred while initiating Google sign-in', variant: 'destructive' });
+    }
   };
+
+  // Google Identity Services (One Tap / Button) setup
+  const googleButtonRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+  const clientId = googleClientId || ((typeof process !== 'undefined' && process.env.REACT_APP_GOOGLE_CLIENT_ID) || import.meta.env.VITE_GOOGLE_CLIENT_ID);
+  if (!clientId) return;
+
+    // Load the Google Identity Services script
+    const scriptId = 'google-identity-services';
+    if (!document.getElementById(scriptId)) {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.id = scriptId;
+      s.async = true;
+      s.defer = true;
+      document.body.appendChild(s);
+    }
+
+      const handleCredentialResponse = async (response: any) => {
+      if (!response?.credential) return;
+      setIsLoading(true);
+      try {
+  const apiUrl = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) || import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const endpoint = userType === 'vendor' ? '/api/auth/google/vendor' : '/api/auth/google/customer';
+        const vendorPayload = userType === 'vendor' ? {
+          idToken: response.credential,
+          businessName,
+          businessPhoneNumber: businessPhone,
+          businessAddress,
+          businessCategory,
+          fullName: contactPerson,
+        } : { idToken: response.credential };
+
+        const res = await fetch(`${apiUrl}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(vendorPayload),
+        });
+        const data = await res.json();
+        setIsLoading(false);
+        if (res.ok) {
+          toast({ title: 'Signed in', description: 'Signed in with Google' });
+          navigate('/');
+        } else {
+          toast({ title: 'Google auth failed', description: data?.message || 'Google sign-in failed', variant: 'destructive' });
+        }
+      } catch (e) {
+        setIsLoading(false);
+        toast({ title: 'Google auth error', description: 'An error occurred during Google sign-in', variant: 'destructive' });
+      }
+    };
+
+    const tryInit = () => {
+      // @ts-ignore - google is loaded dynamically
+      const google = (window as any).google;
+      if (!google || !google.accounts || !google.accounts.id) return;
+
+      try {
+        google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleCredentialResponse,
+        });
+        if (googleButtonRef.current) {
+          google.accounts.id.renderButton(googleButtonRef.current, { theme: 'outline', size: 'large' });
+        }
+        // Optionally enable One Tap
+        // google.accounts.id.prompt();
+      } catch (e) {
+        // ignore initialization errors
+      }
+    };
+
+    // Wait a tick for the script to load
+    const id = setInterval(() => {
+      tryInit();
+    }, 300);
+
+    const timeout = setTimeout(() => clearInterval(id), 10000);
+
+    return () => {
+      clearInterval(id);
+      clearTimeout(timeout);
+    };
+  }, [toast, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5 flex items-center justify-center p-4">
@@ -261,6 +369,8 @@ const Login = () => {
                           <Input 
                             id="business-name" 
                             placeholder="Your business name"
+                            value={businessName}
+                            onChange={(e) => setBusinessName(e.target.value)}
                             required 
                           />
                         </div>
@@ -269,6 +379,8 @@ const Login = () => {
                           <Input 
                             id="contact-person" 
                             placeholder="Full name"
+                            value={contactPerson}
+                            onChange={(e) => setContactPerson(e.target.value)}
                             required 
                           />
                         </div>
@@ -296,6 +408,8 @@ const Login = () => {
                             id="business-phone" 
                             type="tel" 
                             placeholder="+1 (555) 000-0000"
+                            value={businessPhone}
+                            onChange={(e) => setBusinessPhone(e.target.value)}
                             className="pl-10"
                             required 
                           />
@@ -309,6 +423,8 @@ const Login = () => {
                           <Input 
                             id="business-address" 
                             placeholder="Street address, City, State"
+                            value={businessAddress}
+                            onChange={(e) => setBusinessAddress(e.target.value)}
                             className="pl-10"
                             required 
                           />
@@ -317,7 +433,7 @@ const Login = () => {
 
                       <div className="space-y-2">
                         <Label htmlFor="business-category">Business Category</Label>
-                        <Select required>
+                        <Select value={businessCategory} onValueChange={(v: string) => setBusinessCategory(v)} required>
                           <SelectTrigger>
                             <SelectValue placeholder="Select your business category" />
                           </SelectTrigger>

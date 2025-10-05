@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
@@ -29,9 +29,20 @@ import {
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const { user, logout } = useAuth();
-  
-  // Use data from auth context
-  const userData = user || {
+  const [remoteUser, setRemoteUser] = useState<any | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    import('@/lib/api').then(({ apiGet }) => {
+      apiGet('/api/users/profile').then((data) => {
+        if (mounted && data) setRemoteUser(data);
+      }).catch(() => {});
+    });
+    return () => { mounted = false; };
+  }, []);
+
+  // Use data from auth context or remote fetch
+  const userData = remoteUser || user || {
     name: 'Guest User',
     email: 'guest@example.com',
     phone: '+234 800 000 0000',

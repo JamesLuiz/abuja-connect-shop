@@ -64,6 +64,7 @@ const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
     { icon: User, label: 'My Profile', href: '/profile' },
     { icon: ShoppingBag, label: 'Order History', href: '/orders' },
     { icon: Heart, label: 'Wishlist', href: '/wishlist' },
+    { icon: BarChart3, label: 'Blog Analytics', href: '/analytics' },
     { icon: Settings, label: 'Settings', href: '/settings' },
     { icon: HelpCircle, label: 'Help & Support', href: '/help' },
   ];
@@ -72,7 +73,8 @@ const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
     { icon: User, label: 'My Profile', href: '/profile' },
     { icon: Store, label: 'My Store', href: '/vendor/store' },
     { icon: ShoppingBag, label: 'Order Management', href: '/vendor/orders' },
-    { icon: BarChart3, label: 'Analytics', href: '/vendor/analytics' },
+    { icon: BarChart3, label: 'Store Analytics', href: '/vendor/analytics' },
+    { icon: BarChart3, label: 'Blog Analytics', href: '/analytics' },
     { icon: Settings, label: 'Store Settings', href: '/vendor/settings' },
     { icon: HelpCircle, label: 'Help & Support', href: '/help' },
   ];
@@ -82,6 +84,7 @@ const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
     { icon: Shield, label: 'Admin Dashboard', href: '/admin/dashboard' },
     { icon: Users, label: 'Vendor Management', href: '/admin/vendors' },
     { icon: BarChart3, label: 'Platform Analytics', href: '/admin/analytics' },
+    { icon: BarChart3, label: 'Blog Analytics', href: '/analytics' },
     { icon: Settings, label: 'Settings', href: '/admin/settings' },
   ];
 
