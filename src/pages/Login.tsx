@@ -116,27 +116,57 @@ const Login = () => {
 
   const handleGoogleAuth = async () => {
     setIsLoading(true);
-    // Fallback: open Google OAuth redirect URL from backend
     try {
-  const apiUrl = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) || import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const apiUrl = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) || import.meta.env.VITE_API_URL || 'http://localhost:3000';
       // Store current intent for redirect after OAuth completes
       try {
         const intent = (typeof window !== 'undefined') ? (window.sessionStorage.getItem('post_login_redirect') || window.location.pathname + window.location.search + window.location.hash) : '/';
         localStorage.setItem('post_login_redirect', intent || '/');
       } catch (_) {}
-      // The backend exposes GET /api/auth/google which returns { url }
-      const urlRes = await fetch(`${apiUrl}/api/auth/google`);
-      const json = await urlRes.json();
-      if (urlRes.ok && json?.url) {
-        // Redirect the browser to the Google OAuth URL (callback handled on backend)
-        window.location.href = json.url;
-      } else {
-        setIsLoading(false);
-        toast({ title: 'Google auth error', description: 'Could not initiate Google OAuth', variant: 'destructive' });
+
+      // Prefer backend-provided redirect URL, with timeout and robust fallback paths
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      let redirected = false;
+      try {
+        const urlRes = await fetch(`${apiUrl}/api/auth/google`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        const contentType = urlRes.headers.get('content-type') || '';
+        if (urlRes.ok && contentType.includes('application/json')) {
+          const json = await urlRes.json();
+          if (json?.url) {
+            window.location.href = json.url;
+            redirected = true;
+          }
+        }
+      } catch (_) {
+        // ignore fetch/timeout errors and fallback below
+        clearTimeout(timeoutId);
+      }
+
+      if (!redirected) {
+        const stateParam = encodeURIComponent(localStorage.getItem('post_login_redirect') || '/');
+        // Try both forms: with and without /api prefix
+        const primary = `${apiUrl}/auth/google?state=${stateParam}`;
+        const secondary = `${apiUrl}/api/auth/google?state=${stateParam}`;
+        // Attempt primary first; set a quick fallback to secondary if navigation doesn't start
+        const currentHref = typeof window !== 'undefined' ? window.location.href : '';
+        try {
+          window.location.href = primary;
+          setTimeout(() => {
+            try {
+              if (window.location.href === currentHref) {
+                window.location.href = secondary;
+              }
+            } catch (_) {}
+          }, 1200);
+        } catch (_) {
+          window.location.href = secondary;
+        }
       }
     } catch (e) {
       setIsLoading(false);
-      toast({ title: 'Google auth error', description: 'An error occurred while initiating Google sign-in', variant: 'destructive' });
+      toast({ title: 'Google auth error', description: 'Unable to start Google sign-in', variant: 'destructive' });
     }
   };
 
