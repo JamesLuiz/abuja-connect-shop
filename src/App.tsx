@@ -33,6 +33,7 @@ import OAuthCallback from "@/pages/OAuthCallback";
 import AdminDashboard from "@/pages/AdminDashboard";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import AIAssistant from "@/components/AIAssistant";
 import Wishlist from "./pages/Wishlist";
 const queryClient = new QueryClient();
@@ -48,10 +49,31 @@ const App = () => (
           <AIAssistant />
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/vendor/register" element={<VendorRegister />} /> 
+            <Route
+              path="/vendor/register"
+              element={
+                <ProtectedRoute>
+                  <VendorRegister />
+                </ProtectedRoute>
+              }
+            /> 
             <Route path="/vendor/:vendorId" element={<VendorCatalogue />} />
-            <Route path="/orders" element={<OrderTracking />} />
-            <Route path="/checkout" element={<Checkout />} />
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <OrderTracking />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/profile" element={<Profile />} />
             <Route path="/vendor/store" element={<VendorStore />} />
             <Route path="/vendor/orders" element={<VendorOrderManagement />} />
@@ -64,8 +86,22 @@ const App = () => (
             <Route path="/vendor-program" element={<VendorProgram />} />
             <Route path="/customer-support" element={<CustomerSupport />} />
             <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/publish" element={<PublishArticle />} />
+        <Route
+          path="/blog"
+          element={
+            <ProtectedRoute>
+              <Blog />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/blog/publish"
+          element={
+            <ProtectedRoute>
+              <PublishArticle />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/careers/apply/:jobId" element={<JobApplication />} />
