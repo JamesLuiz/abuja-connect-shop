@@ -36,6 +36,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AIAssistant from "@/components/AIAssistant";
 import Wishlist from "./pages/Wishlist";
+import AuthGuard from "@/components/AuthGuard";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -48,6 +49,7 @@ const App = () => (
           <BrowserRouter>
           <AIAssistant />
           <Routes>
+            {/* Public Routes - No authentication required */}
             <Route path="/" element={<Index />} />
             <Route
               path="/vendor/register"
@@ -83,7 +85,6 @@ const App = () => (
             <Route path="/profile/edit" element={<EditProfile />} />
             <Route path="/add-product" element={<AddProduct />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/vendor-program" element={<VendorProgram />} />
             <Route path="/customer-support" element={<CustomerSupport />} />
             <Route path="/wishlist" element={<Wishlist />} />
         <Route
@@ -108,9 +109,102 @@ const App = () => (
         <Route path="/careers/job/:jobId" element={<JobDetails />} />
             <Route path="/category/:category" element={<CategoryVendors />} />
             <Route path="/vendors" element={<VendorsMarketplace />} />
+            <Route path="/vendor/:vendorId" element={<VendorCatalogue />} />
             <Route path="/login" element={<Login />} />
             <Route path="/auth/callback" element={<OAuthCallback />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            
+            {/* Blog - Partially public (some features require auth) */}
+            <Route path="/blog" element={<Blog />} />
+            
+            {/* Protected Routes - Require authentication */}
+            <Route path="/orders" element={
+              <AuthGuard>
+                <OrderTracking />
+              </AuthGuard>
+            } />
+            <Route path="/checkout" element={
+              <AuthGuard>
+                <Checkout />
+              </AuthGuard>
+            } />
+            <Route path="/profile" element={
+              <AuthGuard>
+                <Profile />
+              </AuthGuard>
+            } />
+            <Route path="/profile/edit" element={
+              <AuthGuard>
+                <EditProfile />
+              </AuthGuard>
+            } />
+            <Route path="/wishlist" element={
+              <AuthGuard>
+                <Wishlist />
+              </AuthGuard>
+            } />
+            <Route path="/help" element={
+              <AuthGuard>
+                <HelpSupport />
+              </AuthGuard>
+            } />
+            
+            {/* Vendor-specific routes - Require vendor authentication */}
+            <Route path="/vendor/register" element={<VendorRegister />} />
+            <Route path="/vendor/store" element={
+              <AuthGuard>
+                <VendorStore />
+              </AuthGuard>
+            } />
+            <Route path="/vendor/orders" element={
+              <AuthGuard>
+                <VendorOrderManagement />
+              </AuthGuard>
+            } />
+            <Route path="/vendor/analytics" element={
+              <AuthGuard>
+                <VendorAnalytics />
+              </AuthGuard>
+            } />
+            <Route path="/vendor/settings" element={
+              <AuthGuard>
+                <VendorSettings />
+              </AuthGuard>
+            } />
+            <Route path="/vendor-program" element={
+              <AuthGuard>
+                <VendorProgram />
+              </AuthGuard>
+            } />
+            <Route path="/add-product" element={
+              <AuthGuard>
+                <AddProduct />
+              </AuthGuard>
+            } />
+            
+            {/* Content creation routes - Require authentication */}
+            <Route path="/blog/publish" element={
+              <AuthGuard>
+                <PublishArticle />
+              </AuthGuard>
+            } />
+            <Route path="/careers/apply/:jobId" element={
+              <AuthGuard>
+                <JobApplication />
+              </AuthGuard>
+            } />
+            
+            {/* Admin routes - Require admin authentication */}
+            <Route path="/analytics" element={
+              <AuthGuard>
+                <Analytics />
+              </AuthGuard>
+            } />
+            <Route path="/admin-dashboard" element={
+              <AuthGuard>
+                <AdminDashboard />
+              </AuthGuard>
+            } />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
