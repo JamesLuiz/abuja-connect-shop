@@ -247,13 +247,7 @@ const Blog = () => {
     }
   ];
 
-  const defaultTrendingTopics = [
-    { _id: "E-commerce Growth", count: 0 },
-    { _id: "Digital Marketing", count: 0 },
-    { _id: "Mobile Commerce", count: 0 },
-    { _id: "Customer Retention", count: 0 },
-    { _id: "Vendor Success", count: 0 },
-  ];
+  
 
   const filteredPosts = blogPosts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
