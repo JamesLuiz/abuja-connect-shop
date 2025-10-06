@@ -119,6 +119,11 @@ const Login = () => {
     // Fallback: open Google OAuth redirect URL from backend
     try {
   const apiUrl = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) || import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      // Store current intent for redirect after OAuth completes
+      try {
+        const intent = (typeof window !== 'undefined') ? (window.sessionStorage.getItem('post_login_redirect') || window.location.pathname + window.location.search + window.location.hash) : '/';
+        localStorage.setItem('post_login_redirect', intent || '/');
+      } catch (_) {}
       // The backend exposes GET /api/auth/google which returns { url }
       const urlRes = await fetch(`${apiUrl}/api/auth/google`);
       const json = await urlRes.json();

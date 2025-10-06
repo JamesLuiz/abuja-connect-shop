@@ -12,14 +12,27 @@ const OAuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const params = new URLSearchParams(location.search);
-        const access_token = params.get('access_token');
-        const refresh_token = params.get('refresh_token');
-        
-        if (!access_token || !refresh_token) {
-          console.error('Missing tokens in callback');
-          setStatus('Authentication failed - missing tokens');
-          setTimeout(() => navigate('/login', { replace: true }), 2000);
+        // Parse tokens from both query and hash fragments
+        const queryParams = new URLSearchParams(location.search || '');
+        const hashString = (location.hash || '').replace(/^#/, '');
+        const hashParams = new URLSearchParams(hashString);
+
+        const accessToken = queryParams.get('access_token')
+          || hashParams.get('access_token')
+          || queryParams.get('accessToken')
+          || hashParams.get('accessToken')
+          || queryParams.get('id_token')
+          || hashParams.get('id_token');
+
+        const refreshToken = queryParams.get('refresh_token')
+          || hashParams.get('refresh_token')
+          || queryParams.get('refreshToken')
+          || hashParams.get('refreshToken');
+
+        if (!accessToken) {
+          console.error('Missing access token in callback');
+          setStatus('Authentication failed - missing token');
+          setTimeout(() => navigate('/login', { replace: true }), 1500);
           return;
         }
 
@@ -41,12 +54,12 @@ const OAuthCallback = () => {
       } catch (error) {
         console.error('OAuth callback error:', error);
         setStatus('Authentication failed - redirecting to login');
-        setTimeout(() => navigate('/login', { replace: true }), 2000);
+        setTimeout(() => navigate('/login', { replace: true }), 1500);
       }
     };
 
     handleCallback();
-  }, [location.search, applyAuthResponse, navigate]);
+  }, [location.search, location.hash, applyAuthResponse, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
