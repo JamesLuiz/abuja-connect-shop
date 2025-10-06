@@ -27,10 +27,16 @@ const OAuthCallback = () => {
         // Apply auth response and wait for completion
         await applyAuthResponse({ access_token, refresh_token });
         
-        setStatus('Redirecting to dashboard...');
+        setStatus('Redirecting...');
         // Small delay to ensure tokens are stored
         setTimeout(() => {
-          navigate('/', { replace: true });
+          try {
+            const redirectPath = localStorage.getItem('post_login_redirect') || '/';
+            localStorage.removeItem('post_login_redirect');
+            navigate(redirectPath, { replace: true });
+          } catch (_) {
+            navigate('/', { replace: true });
+          }
         }, 100);
       } catch (error) {
         console.error('OAuth callback error:', error);

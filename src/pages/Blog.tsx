@@ -454,7 +454,7 @@ const Blog = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {trendingTopics.map((topic, index) => (
+                    {(trendingTopics && trendingTopics.length > 0 ? trendingTopics : defaultTrendingTopics).map((topic, index) => (
                       <Button
                         key={index}
                         variant="ghost"
