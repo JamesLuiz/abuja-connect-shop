@@ -23,6 +23,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import AuthPrompt from '@/components/AuthPrompt';
 
 const Blog = () => {
   const navigate = useNavigate();
@@ -281,10 +282,16 @@ const Blog = () => {
             </p>
             
             <div className="flex justify-center mb-8">
-              <Button size="lg" className="group" onClick={() => navigate('/blog/publish')}>
-                Publish Your Article
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <AuthPrompt
+                title="Publish Your Article"
+                description="Sign in to share your insights and stories with our community"
+                action="Sign In to Publish"
+              >
+                <Button size="lg" className="group">
+                  Publish Your Article
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </AuthPrompt>
             </div>
             
             {/* Search Bar */}
@@ -439,9 +446,15 @@ const Blog = () => {
                   <Sparkles className="h-16 w-16 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-semibold mb-2">AI Content Assistant</h3>
                   <p className="text-muted-foreground mb-4">Get AI-powered suggestions for your articles.</p>
-                  <Button onClick={() => navigate('/blog/publish')}>
-                    Create with AI
-                  </Button>
+                  <AuthPrompt
+                    title="Create with AI"
+                    description="Sign in to use our AI-powered content creation tools"
+                    action="Sign In to Create"
+                  >
+                    <Button>
+                      Create with AI
+                    </Button>
+                  </AuthPrompt>
                 </div>
               </TabsContent>
             </Tabs>

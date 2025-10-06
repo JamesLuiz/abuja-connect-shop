@@ -5,12 +5,14 @@ import { Star, ShoppingCart, Heart, Eye } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useState, useMemo } from 'react';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 import AdvancedSearchFilters from '@/components/search/AdvancedSearchFilters';
 import InfiniteScroll from '@/components/ui/InfiniteScroll';
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
 import ProductComparison from '@/components/product/ProductComparison';
 import RecentlyViewed from '@/components/product/RecentlyViewed';
 import SwipeableProductGallery from '@/components/product/SwipeableProductGallery';
+import AuthPrompt from '@/components/AuthPrompt';
 
 const ProductShowcase = () => {
   const [filters, setFilters] = useState({
@@ -28,6 +30,7 @@ const ProductShowcase = () => {
   const [compareProducts, setCompareProducts] = useState<any[]>([]);
 
   const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
   const categories = [
     { id: 'all', name: 'All Vendors' },
     { id: 'electronics', name: 'Electronics' },
