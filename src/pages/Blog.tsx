@@ -248,13 +248,7 @@ const Blog = () => {
     }
   ];
 
-  const trendingTopics = [
-    "E-commerce Growth",
-    "Digital Marketing",
-    "Mobile Commerce",
-    "Customer Retention",
-    "Vendor Success"
-  ];
+  
 
   const filteredPosts = blogPosts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -473,7 +467,7 @@ const Blog = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {trendingTopics.map((topic, index) => (
+                    {(trendingTopics && trendingTopics.length > 0 ? trendingTopics : defaultTrendingTopics).map((topic, index) => (
                       <Button
                         key={index}
                         variant="ghost"

@@ -38,7 +38,13 @@ const Login = () => {
       setIsLoading(false);
       if (success) {
         toast({ title: 'Welcome back!', description: `Signed in as ${userType}` });
-        navigate('/');
+        try {
+          const redirectPath = localStorage.getItem('post_login_redirect') || '/';
+          localStorage.removeItem('post_login_redirect');
+          navigate(redirectPath, { replace: true });
+        } catch (_) {
+          navigate('/', { replace: true });
+        }
       } else {
         toast({ title: 'Login failed', description: 'Please check your credentials and try again.', variant: 'destructive' });
       }
@@ -62,7 +68,15 @@ const Login = () => {
           toast({ title: 'Account created', description: 'Customer account created successfully' });
           // attempt login
           const success = await login(email, password, userType);
-          if (success) navigate('/');
+          if (success) {
+            try {
+              const redirectPath = localStorage.getItem('post_login_redirect') || '/';
+              localStorage.removeItem('post_login_redirect');
+              navigate(redirectPath, { replace: true });
+            } catch (_) {
+              navigate('/', { replace: true });
+            }
+          }
         } else {
           toast({ title: 'Registration failed', description: 'Could not create account', variant: 'destructive' });
         }
@@ -81,7 +95,15 @@ const Login = () => {
         if (res) {
           toast({ title: 'Vendor account created', description: 'Vendor created successfully' });
           const success = await login(email, password, userType);
-          if (success) navigate('/');
+          if (success) {
+            try {
+              const redirectPath = localStorage.getItem('post_login_redirect') || '/';
+              localStorage.removeItem('post_login_redirect');
+              navigate(redirectPath, { replace: true });
+            } catch (_) {
+              navigate('/', { replace: true });
+            }
+          }
         } else {
           toast({ title: 'Registration failed', description: 'Could not create vendor account', variant: 'destructive' });
         }
@@ -155,7 +177,13 @@ const Login = () => {
         setIsLoading(false);
         if (res.ok) {
           toast({ title: 'Signed in', description: 'Signed in with Google' });
-          navigate('/');
+          try {
+            const redirectPath = localStorage.getItem('post_login_redirect') || '/';
+            localStorage.removeItem('post_login_redirect');
+            navigate(redirectPath, { replace: true });
+          } catch (_) {
+            navigate('/', { replace: true });
+          }
         } else {
           toast({ title: 'Google auth failed', description: data?.message || 'Google sign-in failed', variant: 'destructive' });
         }

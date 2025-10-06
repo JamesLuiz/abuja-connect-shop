@@ -33,6 +33,7 @@ import OAuthCallback from "@/pages/OAuthCallback";
 import AdminDashboard from "@/pages/AdminDashboard";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import AIAssistant from "@/components/AIAssistant";
 import Wishlist from "./pages/Wishlist";
 import AuthGuard from "@/components/AuthGuard";
@@ -50,10 +51,62 @@ const App = () => (
           <Routes>
             {/* Public Routes - No authentication required */}
             <Route path="/" element={<Index />} />
+            <Route
+              path="/vendor/register"
+              element={
+                <ProtectedRoute>
+                  <VendorRegister />
+                </ProtectedRoute>
+              }
+            /> 
+            <Route path="/vendor/:vendorId" element={<VendorCatalogue />} />
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <OrderTracking />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/vendor/store" element={<VendorStore />} />
+            <Route path="/vendor/orders" element={<VendorOrderManagement />} />
+            <Route path="/vendor/analytics" element={<VendorAnalytics />} />
+            <Route path="/vendor/settings" element={<VendorSettings />} />
+            <Route path="/help" element={<HelpSupport />} />
+            <Route path="/profile/edit" element={<EditProfile />} />
+            <Route path="/add-product" element={<AddProduct />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/customer-support" element={<CustomerSupport />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/careers/job/:jobId" element={<JobDetails />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+        <Route
+          path="/blog"
+          element={
+            <ProtectedRoute>
+              <Blog />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/blog/publish"
+          element={
+            <ProtectedRoute>
+              <PublishArticle />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/careers/apply/:jobId" element={<JobApplication />} />
+        <Route path="/careers/job/:jobId" element={<JobDetails />} />
             <Route path="/category/:category" element={<CategoryVendors />} />
             <Route path="/vendors" element={<VendorsMarketplace />} />
             <Route path="/vendor/:vendorId" element={<VendorCatalogue />} />
