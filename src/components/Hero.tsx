@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Store, ShoppingBag, Users, TrendingUp } from 'lucide-react';
 import heroImage from '@/assets/hero-shopping.jpg';
 import { useNavigate } from 'react-router-dom';
+import AuthPrompt from '@/components/AuthPrompt';
 
 const Hero = () => {
   const stats = [
@@ -44,10 +45,17 @@ const Hero = () => {
             </div>
 
             <div className="animate-slide-up flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
-              <Button variant="hero" size="lg" className="text-lg px-8 py-4" onClick={() => navigate('/vendor/register')}>
-                Start Selling Today
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <AuthPrompt
+                title="Start Your Vendor Journey"
+                description="Create a vendor account to start selling on our platform"
+                action="Become a Vendor"
+                userType="vendor"
+              >
+                <Button variant="hero" size="lg" className="text-lg px-8 py-4">
+                  Start Selling Today
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </AuthPrompt>
               <Button variant="outline" size="lg" className="text-lg px-8 py-4" onClick={() => {
                 const element = document.getElementById('products');
                 if (element) {
